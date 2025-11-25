@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LOB APP PRO - Traum-Edition</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Varela+Round:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -25,14 +25,15 @@
             --transition-speed: 0.2s;
         }
 
-        body {
+        /* --- WICHTIG: BEHEBUNG DES SCROLL-PROBLEMS --- */
+        html, body {
+            height: 100%; /* Wichtig für korrekte Höhe */
             font-family: 'Varela Round', sans-serif;
             background-color: var(--bg);
             color: var(--text);
             margin: 0; padding: 0;
-            height: 100vh;
             display: flex; flex-direction: column;
-            overflow: hidden;
+            overflow-y: auto; /* Erlaube Scrollen auf Body-Ebene */
             -webkit-tap-highlight-color: transparent;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.5' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
         }
@@ -52,12 +53,13 @@
         header {
             padding: 15px 20px; background: rgba(26, 26, 26, 0.85); backdrop-filter: blur(12px); 
             display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; z-index: 10;
+            position: sticky; top: 0; 
         }
-        main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 90px; }
+        main { flex: 1; padding: 20px; padding-bottom: 90px; } /* Entferne overflow-y: auto hier */
 
         /* --- LOGIN --- */
         #login-view {
-            height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
             background: radial-gradient(circle at top, #2a2a2a 0%, var(--bg) 100%); padding: 20px;
         }
         .user-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; max-width: 400px; }
@@ -106,7 +108,7 @@
 
         /* --- NAVIGATION BAR --- */
         .nav-bar {
-            position: fixed; bottom: 0; left: 0; width: 100%;
+            position: sticky; bottom: 0; left: 0; width: 100%;
             background: rgba(26, 26, 26, 0.95); backdrop-filter: blur(10px); border-top: 1px solid #333;
             display: flex; justify-content: space-around; padding: 10px 0 25px 0; z-index: 50;
         }
@@ -134,11 +136,13 @@
 
         /* --- INPUTS & FORMS --- */
         .settings-card { background: var(--surface); padding: 20px; border-radius: 16px; margin-bottom: 20px; }
-        input { 
+        input, select { 
             width: 100%; padding: 14px; background: #111; border: 1px solid #333; border-radius: 8px; 
             color: white; margin-bottom: 10px; box-sizing: border-box; transition: border-color var(--transition-speed);
+            -webkit-appearance: none; /* iOS/Safari */
+            appearance: none;
         }
-        input:focus { border-color: var(--primary); outline: none; }
+        input:focus, select:focus { border-color: var(--primary); outline: none; }
         .btn-main { 
             width: 100%; padding: 14px; background: var(--primary); color: white; border: none; 
             border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: background var(--transition-speed), transform 0.1s; 
@@ -147,25 +151,32 @@
         .btn-main:active { transform: scale(0.99); }
         
         /* --- ADMIN LOGS --- */
-        .log-entry { font-size: 0.8rem; padding: 12px 0; border-bottom: 1px solid #333; line-height: 1.4; }
+        .log-entry { font-size: 0.8rem; padding: 12px 0; border-bottom: 1px solid #333; line-height: 1.4; display: flex; justify-content: space-between; align-items: center;}
+        .log-content { flex-grow: 1; }
         .admin-filter-bar button {
             background: #252525; color: #ccc; border: 1px solid #444; padding: 8px 12px; border-radius: 8px;
             cursor: pointer; margin-right: 5px; font-size: 0.8rem; transition: background 0.2s;
         }
         .admin-filter-bar button.active { background: var(--primary); color: white; border-color: var(--primary); }
         
-        /* --- SHOP / REWARDS --- */
-        .reward-card {
-            background: var(--surface); padding: 20px; border-radius: 16px; margin-bottom: 15px;
-            display: flex; justify-content: space-between; align-items: center; border: 1px solid #333;
-            transition: all var(--transition-speed);
+        /* --- SHOP / REWARDS (NEU: RASTER) --- */
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
         }
-        .reward-card:hover { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
-        .reward-info { flex-grow: 1; }
-        .reward-cost-badge {
-            font-size: 1rem; font-weight: 800; color: var(--primary); margin-left: 20px;
-            display: flex; align-items: center;
+        .shop-item-card {
+            background: var(--surface); border: 1px solid #333; border-radius: 16px;
+            padding: 20px; text-align: center; cursor: pointer; transition: all var(--transition-speed);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            display: flex; flex-direction: column; align-items: center;
         }
+        .shop-item-card:hover { border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 4px 20px var(--primary-glow); }
+        .shop-icon { font-size: 3rem; color: var(--accent); margin-bottom: 10px; }
+        .shop-cost { font-weight: 700; color: gold; font-size: 1.1rem; margin-top: 5px; }
+        .shop-item-card.disabled { opacity: 0.5; cursor: not-allowed; }
+        
         /* Style für die spezifischen Kontostände (Home/Shop) */
         .score-display-small {
             background: #222; padding: 12px 15px; border-radius: 10px; margin-bottom: 10px;
@@ -173,11 +184,25 @@
             font-weight: 600; font-size: 0.95rem;
             border-left: 4px solid var(--accent);
         }
-        .score-display-small.thomas {
-            border-left-color: #00bcd4; /* Türkis für Thomas */
+        .score-display-small.thomas { border-left-color: #00bcd4; } 
+        .score-display-small.emil { border-left-color: #ff9900; }
+        .score-container { display: flex; flex-direction: column; gap: 5px; }
+        
+        /* Admin Log Delete Button */
+        .btn-delete-log {
+            background: var(--danger);
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 0.8rem;
         }
-        .score-display-small.emil {
-            border-left-color: #ff9900; /* Gold/Orange für Emil */
+        
+        .admin-super-user {
+            background: linear-gradient(135deg, #111, #333);
+            border-left: 5px solid #00bcd4;
         }
     </style>
 </head>
@@ -193,7 +218,7 @@
         </div>
     </div>
 
-    <div id="app-view" class="hidden">
+    <div id="app-view" class="hidden" style="min-height: 100vh;">
         <header>
             <div class="header-title">Hallo <span id="header-username">User</span></div>
             <div>
@@ -212,9 +237,8 @@
                 </div>
                 
                 <div class="section-header" style="margin-top: 5px;">Deine Separaten Lob-Konten</div>
-                <div id="home-separate-scores">
+                <div class="score-container" id="home-separate-scores">
                     </div>
-
 
                 <div id="reward-tracking-box" class="reward-progress hidden">
                     <div style="font-weight:600; color:#fff;">Nächste Prämie (Bester Score): <span id="next-reward-name" style="color:var(--accent);"></span></div>
@@ -243,11 +267,11 @@
             
             <div id="tab-shop" class="fade-in hidden">
                 <div class="section-header">Deine Separaten Lob-Konten</div>
-                <div id="shop-separate-scores">
+                <div class="score-container" id="shop-separate-scores">
                     </div>
 
                 <div class="section-header" style="margin-top: 40px;">Verfügbare Prämien</div>
-                <div id="shop-reward-list">
+                <div id="shop-reward-list" class="shop-grid">
                     </div>
                 <div style="text-align:center; margin-top:30px; color:var(--text-muted); font-size:0.9rem;">
                     *Jede Prämie muss vollständig von **einem** Konto bezahlt werden.
@@ -277,6 +301,15 @@
             </div>
 
             <div id="tab-admin" class="fade-in hidden">
+                
+                <div class="section-header">Super-User Steuerung</div>
+                <div class="settings-card admin-super-user">
+                    <p style="font-size:0.9rem; color: #00bcd4; font-weight: bold;"><i class="fas fa-magic"></i> Admin Super-Lob Status</p>
+                    <p id="admin-lob-status">Lob: Unbekannt</p>
+                    <button class="btn-main" onclick="setAdminSuperLobs()" style="background: #00bcd4;"><i class="fas fa-infinity"></i> 9999 Lobs setzen</button>
+                    <p style="margin-top:10px; font-size:0.8rem; color:var(--text-muted);">Der Admin-Score ist nicht sichtbar für andere und kann zum Testen von Prämien im Shop genutzt werden.</p>
+                </div>
+
                 <div class="section-header">Prämien Verwaltung</div>
                 <div class="settings-card">
                     <input type="text" id="adm-rew-name" placeholder="Prämie Name">
@@ -285,11 +318,11 @@
                     <div id="reward-list" style="margin-top:20px;"></div>
                 </div>
 
-                <div class="section-header">Benutzerverwaltung (Admin)</div>
+                <div class="section-header">Benutzerverwaltung</div>
                 <div id="admin-user-list" class="settings-card">
                     </div>
 
-                <div class="section-header">System Protokoll</div>
+                <div class="section-header">System Protokoll & Lob-Rückzug</div>
                 <div class="admin-filter-bar" style="margin-bottom: 15px;">
                     <button id="filter-all" class="active" onclick="setLogFilter('ALL')">Alle</button>
                     <button id="filter-lob" onclick="setLogFilter('LOB')">Lob-Aktionen</button>
@@ -323,11 +356,19 @@
 
 <script>
     // --- CONFIG & STATE ---
-    // WICHTIG: Ersetzen Sie DIESE URL durch die URL Ihres Render-Dienstes (z.B. https://ihre-app.onrender.com)
+    // WICHTIG: Ersetzen Sie DIESE URL durch die URL Ihres Render-Dienstes, wenn Sie online sind.
     // Wenn Sie die App lokal laufen lassen, nutzen Sie: 'http://localhost:3000'
-    const API_URL = 'https://lobapp-server.onrender.com'; 
+    const API_URL = 'http://localhost:3000'; 
     const MASKOTTCHEN_ICON = '<i class="fas fa-hiking"></i>';
     
+    // Definition der Prämie Icons
+    const REWARD_ICONS = {
+        'Kaffeepause gespendet': '<i class="fas fa-mug-hot"></i>',
+        'Pizza-Mittagessen': '<i class="fas fa-pizza-slice"></i>',
+        'Extra Urlaubstag': '<i class="fas fa-plane-departure"></i>',
+        'default': '<i class="fas fa-star"></i>'
+    };
+
     // DEFINITION DER STANDARDDATEN
     const DEFAULT_DB = {
         users: {
@@ -335,7 +376,6 @@
                 password: "nacke", 
                 image: "https://api.dicebear.com/7.x/notionists/svg?seed=Thomas", 
                 lastSeenScore: 0, 
-                // Thomas empfängt Lob von EMIL und MARIUS.
                 received: { "Emil": 0, "Marius": 0 }, 
                 badges: [] 
             },
@@ -343,7 +383,6 @@
                 password: "nacke", 
                 image: "https://api.dicebear.com/7.x/notionists/svg?seed=Emil", 
                 lastSeenScore: 0, 
-                // Emil empfängt Lob von THOMAS und MARIUS.
                 received: { "Thomas": 0, "Marius": 0 }, 
                 badges: [] 
             },
@@ -351,16 +390,24 @@
                 password: "nacke", 
                 image: "https://api.dicebear.com/7.x/notionists/svg?seed=Marius", 
                 lastSeenScore: 0, 
-                // Marius empfängt Lob von THOMAS und EMIL.
                 received: { "Thomas": 0, "Emil": 0 }, 
                 badges: [] 
-            } 
+            },
+             // NEU: Admin-Test-Konto, falls es nicht im Live-DB ist
+            "Admin": { 
+                password: "nacke", 
+                image: "https://api.dicebear.com/7.x/micah/svg?seed=Admin", 
+                lastSeenScore: 0, 
+                received: {}, // Admin empfängt nichts von Usern
+                adminLobs: 0, // Speicherort für Admin-Lobs
+                badges: [] 
+            }
         },
         logs: [],
         rewards: [
-            { id: 1, name: 'Kaffeepause gespendet', cost: 20 },
-            { id: 2, name: 'Pizza-Mittagessen', cost: 50 },
-            { id: 3, name: 'Extra Urlaubstag', cost: 100 }
+            { id: 1, name: 'Kaffeepause gespendet', cost: 20, desc: 'Ein leckerer Kaffee aufs Haus.' },
+            { id: 2, name: 'Pizza-Mittagessen', cost: 50, desc: 'Pizza für das Team, bezahlt aus deinem Lob-Konto.' },
+            { id: 3, name: 'Extra Urlaubstag', cost: 100, desc: 'Nimm dir einen Tag frei. Gönn es dir!' }
         ]
     };
     
@@ -390,25 +437,33 @@
         }
 
         // Kompatibilität & Initialisierung
+        // Stelle sicher, dass das Admin-Konto existiert und initialisiert ist
+        if (!db.users['Admin']) {
+            db.users['Admin'] = DEFAULT_DB.users['Admin'];
+        }
+
         for(let u in db.users) {
             if(typeof db.users[u].lastSeenScore === 'undefined') db.users[u].lastSeenScore = 0;
             if(typeof db.users[u].autoLogin === 'undefined') db.users[u].autoLogin = false;
             if(typeof db.users[u].badges === 'undefined') db.users[u].badges = [];
             
-            // Stellt sicher, dass das received-Objekt existiert, falls es fehlt
             if(typeof db.users[u].received === 'undefined') {
                 db.users[u].received = {};
             }
-
-            // Entferne alte, nicht mehr verwendete Felder
-            if(typeof db.users[u].group !== 'undefined') delete db.users[u].group;
-            if(typeof db.users[u].givenTotal !== 'undefined') delete db.users[u].givenTotal;
+            // NEU: Admin-Lobs initialisieren
+            if(u === 'Admin' && typeof db.users[u].adminLobs === 'undefined') {
+                db.users[u].adminLobs = 0;
+            }
         }
 
         if(!db.rewards || !Array.isArray(db.rewards)) db.rewards = DEFAULT_DB.rewards;
         db.rewards.sort((a,b) => a.cost - b.cost); 
 
-        renderLogin();
+        // Admin-Konto aus der Login-Grid entfernen, wenn es existiert
+        let loginUsers = {...db.users};
+        if (loginUsers['Admin']) delete loginUsers['Admin']; 
+        renderLogin(loginUsers);
+
 
         const savedUser = localStorage.getItem('lobAutoUser');
         if(savedUser && db.users[savedUser] && db.users[savedUser].autoLogin) {
@@ -417,12 +472,33 @@
         
         document.querySelector('.login-mascot').innerHTML = MASKOTTCHEN_ICON;
     }
+    
+    // NEU: Login-Rendering anpassen, um Admin auszuschließen
+    function renderLogin(users) {
+        const grid = document.getElementById('login-grid');
+        grid.innerHTML = '';
+        Object.keys(users).forEach(u => {
+            grid.innerHTML += `
+                <div class="user-card" onclick="attemptLogin('${u}')">
+                    <div class="avatar" style="background-image:url('${db.users[u].image}')"></div>
+                    <div style="font-weight:700;">${u}</div>
+                </div>
+            `;
+        });
+    }
 
     async function save() {
         if(isOnline) {
             try {
                 // Sende den gesamten DB-Stand an den Server
-                await fetch(API_URL + '/update', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(db)});
+                const res = await fetch(API_URL + '/update', { 
+                    method:'POST', 
+                    headers:{'Content-Type':'application/json'}, 
+                    body:JSON.stringify(db)
+                });
+                if (!res.ok) {
+                     console.error("Speichern fehlgeschlagen. Status:", res.status);
+                }
             } catch(e) { 
                 console.error("Fehler beim Speichern auf dem Server.", e);
             }
@@ -434,6 +510,9 @@
 
     // --- HELPER FUNKTIONEN (SCORE) ---
     function calculateTotalScore(user) {
+        // NEU: Admin-Check - Admin bekommt seinen Score aus adminLobs
+        if (user === 'Admin') return db.users['Admin'].adminLobs || 0; 
+
         let total = 0;
         const myData = db.users[user];
         for(let sender in myData.received) total += myData.received[sender];
@@ -441,24 +520,25 @@
     }
 
     function getRelevantScores(user) {
+        // NEU: Admin-Check - Admin hat keine relevanten Konten im User-Sinn
+        if (user === 'Admin') return [];
+
         if (!db.users[user] || !db.users[user].received) return [];
 
-        // Gehe alle erhaltenen Konten durch und ignoriere den Benutzer selbst
         const relevantScores = Object.entries(db.users[user].received)
             .filter(([senderName, score]) => senderName !== user) 
             .map(([senderName, score]) => ({
                 name: senderName,
                 score: score,
-                // Hilfsklasse für Thomas/Emil-Farben
                 cssClass: senderName === 'Thomas' ? 'thomas' : (senderName === 'Emil' ? 'emil' : '')
             }));
 
-        // Sortiere nach Name für konsistente Anzeige (z.B. Emil vor Marius)
         return relevantScores.sort((a, b) => a.name.localeCompare(b.name));
     }
     
-    // --- HELPER FUNKTIONEN (Visuals, Login, Navigation etc.) ---
     function checkBadges(user, total) {
+        if (user === 'Admin') return; // NEU: Admin ausschließen
+
         const badges = [
             { threshold: 10, name: "Starter-Rucksack", icon: '<i class="fas fa-walking"></i>' },
             { threshold: 50, name: "Erfahrener Backpacker", icon: '<i class="fas fa-map-marked-alt"></i>' },
@@ -483,6 +563,8 @@
     }
     
     function renderBadges(user) {
+        if (user === 'Admin') return; // NEU: Admin ausschließen
+        
         const data = db.users[user];
         const display = document.getElementById('badge-display');
         const profileDisplay = document.getElementById('profile-badge-display');
@@ -498,19 +580,6 @@
             const icon = badgeIcons[name] || '<i class="fas fa-award"></i>';
             display.innerHTML += `<span title="${name}" style="margin: 0 5px; color:var(--accent);">${icon}</span>`;
             profileDisplay.innerHTML += `<span title="${name}" style="margin: 0 5px; color:var(--accent);">${icon}</span>`;
-        });
-    }
-
-    function renderLogin() {
-        const grid = document.getElementById('login-grid');
-        grid.innerHTML = '';
-        Object.keys(db.users).forEach(u => {
-            grid.innerHTML += `
-                <div class="user-card" onclick="attemptLogin('${u}')">
-                    <div class="avatar" style="background-image:url('${db.users[u].image}')"></div>
-                    <div style="font-weight:700;">${u}</div>
-                </div>
-            `;
         });
     }
 
@@ -569,7 +638,8 @@
 
         if(currentUser === 'Admin') {
             document.getElementById('nav-admin').classList.remove('hidden');
-            nav('admin');
+            // Admin bekommt eigene Startseite
+            nav('admin'); 
         } else {
             document.getElementById('nav-admin').classList.add('hidden');
             const total = calculateTotalScore(currentUser);
@@ -641,7 +711,6 @@
             const total = calculateTotalScore(currentUser);
             
             if(tab === 'activity') {
-                // Setze gelesene Lobs zurück, wenn Aktivitäts-Tab geöffnet wird
                 unreadLobs = 0;
                 updateActivityBadge();
             }
@@ -649,6 +718,13 @@
             if(tab === 'activity') renderActivity();
             if(tab === 'shop') renderShop(); 
             if(tab === 'profile') renderProfile(total);
+        } else {
+             // Admin spezifische Navigations-Routinen
+            if(tab === 'home' || tab === 'activity' || tab === 'profile') {
+                // Admin auf andere User-Ansichten umleiten, aber ohne eigene Scores/Badges
+                document.getElementById('score-display').innerText = 'N/A';
+                document.getElementById('home-separate-scores').innerHTML = '<div style="text-align:center; color:var(--text-muted); padding: 10px;">Admin hat keine öffentlichen Lob-Konten.</div>';
+            }
         }
 
         if(tab === 'leaderboard') renderLeaderboard();
@@ -660,19 +736,16 @@
         document.getElementById('score-display').innerText = total;
         renderBadges(currentUser);
         
-        // 🎯 DYNAMISCHES RENDERING DER KONTEN
         const relevantScores = getRelevantScores(currentUser);
         const homeScoresDiv = document.getElementById('home-separate-scores');
         homeScoresDiv.innerHTML = '';
         
-        let maxScore = total; // Bester Score zur Berechnung der nächsten Prämie
+        let maxScore = total; 
         
         if (relevantScores.length > 0) {
             relevantScores.forEach(s => {
-                // Setze den höchsten Einzelscore für das Prämien-Tracking
                 if (s.score > maxScore) maxScore = s.score; 
 
-                // HTML-Rendering für die Kontostandsanzeige
                 homeScoresDiv.innerHTML += `
                     <div class="score-display-small ${s.cssClass}">
                         <div><i class="fas fa-user${s.cssClass === 'thomas' ? '-circle' : ''}" style="color: ${s.cssClass === 'thomas' ? '#00bcd4' : (s.cssClass === 'emil' ? '#ff9900' : 'gold')};"></i> Konto ${s.name}</div>
@@ -687,7 +760,7 @@
         const list = document.getElementById('lob-list');
         list.innerHTML = '';
         Object.keys(db.users).forEach(u => {
-            if(u !== currentUser) {
+            if(u !== currentUser && u !== 'Admin') { // Admin kann Admin nicht loben
                 list.innerHTML += `
                     <div class="lob-target-btn" onclick="openLobMenu('${u}')">
                         <div class="avatar" style="background-image:url('${db.users[u].image}'); width:50px; height:50px; margin-right: 15px;"></div>
@@ -701,7 +774,6 @@
             }
         });
         
-        // Belohnungs-Tracking (basiert auf dem höchsten verfügbaren Einzelkonto oder Gesamtscore)
         const nextReward = db.rewards.find(r => r.cost > maxScore);
         const rewardBox = document.getElementById('reward-tracking-box');
         
@@ -721,19 +793,25 @@
 
     // --- LOBEN FUNKTIONEN ---
     async function openLobMenu(targetUser) {
+        let options = {};
+        for (let i = 1; i <= 10; i++) {
+            options[i] = `${i} Lob${i > 1 ? 's' : ''}`;
+        }
+
         const { value: count } = await Swal.fire({
             title: `Lob für ${targetUser}`,
-            text: 'Wie viele Lobs möchtest du geben?',
-            input: 'range',
-            inputLabel: 'Anzahl der Lobs (1-10)',
-            inputValue: 5,
-            inputAttributes: {
-                min: 1, max: 10, step: 1
-            },
+            html: `
+                <p>Wähle die Anzahl der Lobs, die du geben möchtest:</p>
+                <select id="swal-select-count" class="swal2-input">
+                    ${Object.entries(options).map(([val, text]) => `<option value="${val}">${text}</option>`).join('')}
+                </select>
+            `,
+            focusConfirm: false,
             showCancelButton: true,
             confirmButtonText: 'Lob senden',
             confirmButtonColor: 'var(--primary)',
             background: '#1a1a1a', color: '#fff',
+            preConfirm: () => document.getElementById('swal-select-count').value
         });
 
         if (count) {
@@ -742,21 +820,37 @@
     }
 
     async function sendLob(targetUser, count) {
-        if (count <= 0 || !db.users[targetUser]) return;
-
-        // Lob wird dem received-Objekt des Ziels gutgeschrieben, unter dem Schlüssel des Senders (currentUser)
-        db.users[targetUser].received[currentUser] = (db.users[targetUser].received[currentUser] || 0) + count;
+        if (count <= 0 || !db.users[targetUser] || !db.users[targetUser].received) return;
         
+        // NEU: Nur NICHT-Admin-User können Lob empfangen
+        if (targetUser !== 'Admin') {
+            // Wenn der Sender Admin ist, ist das received-Konto vom Typ 'Admin', 
+            // ansonsten vom Typ des Senders
+            const senderKey = currentUser === 'Admin' ? 'Admin' : currentUser; 
+            
+            db.users[targetUser].received[senderKey] = (db.users[targetUser].received[senderKey] || 0) + count;
+        } 
+        
+        // Admin-Lobs werden ignoriert
+
         db.logs.unshift({
+            id: Date.now(),
             time: new Date().toLocaleString(),
-            msg: `${currentUser} lobt ${targetUser} mit ${count} Punkten. (LOB)`
+            msg: `${currentUser} lobt ${targetUser} mit ${count} Punkten. (LOB)`,
+            sender: currentUser,
+            receiver: targetUser,
+            amount: count
         });
 
         await save();
         fireConfetti(100);
 
         // Update der lokalen Ansicht
-        nav('home');
+        if (currentUser !== 'Admin') {
+            nav('home');
+        } else {
+             nav('admin');
+        }
 
         Swal.fire({
             title: 'Lob gesendet!',
@@ -767,160 +861,214 @@
         });
     }
 
-    // --- SHOP ---
-    function renderShop() {
-        const relevantScores = getRelevantScores(currentUser);
-        const shopScoresDiv = document.getElementById('shop-separate-scores');
-        shopScoresDiv.innerHTML = '';
+    // --- AKTIVITÄT ---
+    function renderActivity() {
+        const logDiv = document.getElementById('activity-log');
+        logDiv.innerHTML = '';
         
-        let highestAvailableScore = 0;
-        
-        if (relevantScores.length > 0) {
-            relevantScores.forEach(s => {
-                if (s.score > highestAvailableScore) highestAvailableScore = s.score;
-                
-                shopScoresDiv.innerHTML += `
-                    <div class="score-display-small ${s.cssClass}">
-                        <div><i class="fas fa-user${s.cssClass === 'thomas' ? '-circle' : ''}" style="color: ${s.cssClass === 'thomas' ? '#00bcd4' : (s.cssClass === 'emil' ? '#ff9900' : 'gold')};"></i> Konto ${s.name}</div>
-                        <div>${s.score}</div>
-                    </div>
-                `;
-            });
-        } else {
-             shopScoresDiv.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 10px;">Keine Shop-Konten vorhanden.</div>`;
+        if (currentUser === 'Admin') {
+             logDiv.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding: 20px;">Admin nutzt das Protokoll im Admin-Tab.</div>`;
+             return;
         }
+
+        const filteredLogs = db.logs.filter(log => log.sender === currentUser || log.receiver === currentUser);
+        
+        if (filteredLogs.length === 0) {
+            logDiv.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding: 20px;">Noch keine Aktivitäten.</div>`;
+            return;
+        }
+        
+        filteredLogs.forEach(log => {
+            const isSent = log.sender === currentUser;
+            const style = isSent ? 'color: var(--danger);' : 'color: var(--accent);';
+            const icon = isSent ? '<i class="fas fa-arrow-up"></i>' : '<i class="fas fa-arrow-down"></i>';
+            const actionText = isSent ? `An ${log.receiver}` : `Von ${log.sender}`;
+            const amount = log.amount || (log.msg.includes('Kosten') ? '-' + log.msg.match(/Kosten: (\d+)/)[1] : '');
+
+            logDiv.innerHTML += `
+                <div class="log-entry">
+                    <div class="log-content">
+                        <div style="font-weight: 600;">
+                            <span style="${style}">${icon} ${isSent ? 'GESENDET' : 'ERHALTEN'}</span>
+                            <span style="font-size: 0.8rem; color: var(--text-muted); margin-left: 10px;">${log.time.split(',')[0]}</span>
+                        </div>
+                        <div style="font-size: 0.9rem;">${actionText}: ${log.msg.includes('(REWARD)') ? log.msg.split('gelöst')[0] + ' eingelöst' : log.msg.split('lobt')[0] + ' Lob gegeben'}</div>
+                    </div>
+                    <div style="font-size: 1.2rem; font-weight: 700; ${style}">${amount}</div>
+                </div>
+            `;
+        });
+
+        // WICHTIG: Setze lastSeenScore auf den aktuellen Gesamtscore nach dem Anschauen der Aktivität
+        if (currentUser && currentUser !== 'Admin') {
+             db.users[currentUser].lastSeenScore = calculateTotalScore(currentUser);
+             save();
+        }
+    }
+
+
+    // --- SHOP (NEU: RASTER) ---
+    function renderShop() {
+        // NEU: Admin kann Shop mit adminLobs nutzen
+        if (currentUser === 'Admin') {
+            document.getElementById('shop-separate-scores').innerHTML = `
+                <div class="score-display-small admin-super-user">
+                    <div><i class="fas fa-infinity" style="color: #00bcd4;"></i> Admin Super-Konto</div>
+                    <div>${db.users['Admin'].adminLobs}</div>
+                </div>
+            `;
+        } else {
+            // Normale Benutzeransicht
+            const relevantScores = getRelevantScores(currentUser);
+            const shopScoresDiv = document.getElementById('shop-separate-scores');
+            shopScoresDiv.innerHTML = '';
+            
+            if (relevantScores.length > 0) {
+                relevantScores.forEach(s => {
+                    shopScoresDiv.innerHTML += `
+                        <div class="score-display-small ${s.cssClass}">
+                            <div><i class="fas fa-user${s.cssClass === 'thomas' ? '-circle' : ''}" style="color: ${s.cssClass === 'thomas' ? '#00bcd4' : (s.cssClass === 'emil' ? '#ff9900' : 'gold')};"></i> Konto ${s.name}</div>
+                            <div>${s.score}</div>
+                        </div>
+                    `;
+                });
+            } else {
+                 shopScoresDiv.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 10px;">Keine Shop-Konten vorhanden.</div>`;
+            }
+        }
+        
+        const highestAvailableScore = calculateTotalScore(currentUser);
+
 
         const shopDiv = document.getElementById('shop-reward-list');
         shopDiv.innerHTML = '';
 
         db.rewards.forEach(r => {
             const canAfford = highestAvailableScore >= r.cost;
-            
-            const buttonText = canAfford ? 'Einlösen' : `Fehlen ${r.cost - highestAvailableScore}`;
-            const buttonColor = canAfford ? 'var(--primary)' : '#444';
+            const icon = REWARD_ICONS[r.name] || REWARD_ICONS['default'];
 
             shopDiv.innerHTML += `
-                <div class="reward-card fade-in">
-                    <div class="reward-info">
-                        <div style="font-weight:700;">${r.name}</div>
-                        <div style="font-size:0.85rem; color:var(--text-muted);">Kosten: ${r.cost} Lobs</div>
-                    </div>
-                    <div class="reward-cost-badge">
-                        ${r.cost} <i class="fas fa-star" style="color:gold; margin-left: 5px;"></i>
-                    </div>
-                    <button class="btn-main" style="width:100px; padding:10px; margin-left:15px; background:${buttonColor};" 
-                            ${canAfford ? `onclick="redeemReward(${r.id})"` : 'disabled'}>
-                        ${buttonText}
-                    </button>
+                <div class="shop-item-card ${canAfford ? '' : 'disabled'}" onclick="${canAfford ? `openShopItem(${r.id})` : ''}">
+                    <div class="shop-icon">${icon}</div>
+                    <div style="font-weight:700;">${r.name}</div>
+                    <div class="shop-cost">${r.cost} Lobs</div>
                 </div>
             `;
         });
     }
 
-    async function redeemReward(id) {
+    async function openShopItem(id) {
         const reward = db.rewards.find(r => r.id === id);
-        const relevantScores = getRelevantScores(currentUser);
         
-        const options = {};
-        let eligibleScores = 0;
+        let options = {};
 
-        relevantScores.forEach(s => {
-            if (s.score >= reward.cost) {
-                options[s.name] = `Konto ${s.name} (${s.score} Lobs)`;
-                eligibleScores++;
+        if (currentUser === 'Admin') {
+            // ADMIN-Logik: Prüfe nur das Super-Konto
+            const adminLobs = db.users['Admin'].adminLobs || 0;
+            if (adminLobs >= reward.cost) {
+                options['Admin'] = `Admin Super-Konto (${adminLobs} Lobs)`;
             }
-        });
+        } else {
+            // Normale Benutzerkonten
+            const relevantScores = getRelevantScores(currentUser);
+            relevantScores.forEach(s => {
+                if (s.score >= reward.cost) {
+                    options[s.name] = `Konto ${s.name} (${s.score} Lobs)`;
+                }
+            });
+        }
 
-        if (eligibleScores === 0) {
+
+        if (Object.keys(options).length === 0) {
              Swal.fire('Fehlgeschlagen', 'Kein Konto hat genügend Lobs für diese Prämie.', 'error');
              return;
         }
 
-        // Auswahl des Kontos
         const { value: scoreSource } = await Swal.fire({
-            title: `Prämie: ${reward.name} (${reward.cost} Lobs)`,
-            text: `Wähle das Konto, das die ${reward.cost} Lobs bezahlen soll:`,
-            input: 'radio',
-            inputOptions: options,
-            inputValidator: (value) => {
-                if (!value) {
-                    return 'Du musst ein Konto auswählen!';
-                }
-            },
+            title: reward.name,
+            html: `
+                <p style="font-size:0.9rem; color:#ccc;">${reward.desc || 'Keine Beschreibung vorhanden.'}</p>
+                <div style="font-weight:700; color:gold; margin-bottom:15px;">Kosten: ${reward.cost} Lobs</div>
+                <select id="swal-select-account" class="swal2-input">
+                    <option value="">-- Wähle ein Konto --</option>
+                    ${Object.entries(options).map(([val, text]) => `<option value="${val}">${text}</option>`).join('')}
+                </select>
+            `,
+            focusConfirm: false,
             showCancelButton: true,
-            confirmButtonText: 'Kostenpflichtig Einlösen',
+            confirmButtonText: `Kaufen (${reward.cost} Lobs)`,
             confirmButtonColor: 'var(--primary)',
             background: '#1a1a1a', color: '#fff',
+            preConfirm: () => {
+                const selectedAccount = document.getElementById('swal-select-account').value;
+                if (!selectedAccount) {
+                    Swal.showValidationMessage('Du musst ein Konto auswählen!'); return false;
+                }
+                return selectedAccount;
+            }
         });
         
         if (scoreSource) {
-            const currentScore = db.users[currentUser].received[scoreSource];
-            
+            redeemReward(reward.id, scoreSource);
+        }
+    }
+
+    async function redeemReward(id, scoreSource) {
+        const reward = db.rewards.find(r => r.id === id);
+        
+        let currentScore = 0;
+        let success = false;
+        
+        if (scoreSource === 'Admin') {
+            // NEU: Logik für Admin Super-Konto
+            currentScore = db.users['Admin'].adminLobs || 0;
             if (currentScore >= reward.cost) {
-                // Deduktion vom spezifischen Sender-Konto
+                db.users['Admin'].adminLobs -= reward.cost;
+                success = true;
+            }
+        } else {
+            // Logik für normale Benutzerkonten
+            currentScore = db.users[currentUser].received[scoreSource];
+            if (currentScore >= reward.cost) {
                 db.users[currentUser].received[scoreSource] -= reward.cost;
-                
-                db.logs.unshift({
-                    time: new Date().toLocaleString(),
-                    msg: `${currentUser} löst Prämie '${reward.name}' ein. Belastet: Konto ${scoreSource}. Kosten: ${reward.cost} (REWARD)`
-                });
-                
-                await save();
-                
-                // Update der Ansichten
-                renderShop();
-                renderDashboard(calculateTotalScore(currentUser));
-                
-                Swal.fire('Erfolgreich eingelöst!', `Der Lob-Stand von Konto ${scoreSource} wurde um ${reward.cost} reduziert.`, 'success');
-            } else {
-                 Swal.fire('Fehlgeschlagen', 'Der Kontostand ist nicht ausreichend für diese Prämie.', 'error');
+                success = true;
             }
         }
-    }
 
-    // --- AKTIVITÄT & LOGS ---
-    function renderActivity() {
-        const logDiv = document.getElementById('activity-log');
-        logDiv.innerHTML = '';
-
-        // Zeige nur Logs, die den aktuellen Benutzer betreffen
-        const userLogs = db.logs.filter(log => 
-            log.msg.includes(currentUser)
-        );
-
-        if (userLogs.length === 0) {
-            logDiv.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding: 20px;">Noch keine Aktivität für ${currentUser}.</div>`;
-            return;
+        if (success) {
+            db.logs.unshift({
+                id: Date.now(),
+                time: new Date().toLocaleString(),
+                msg: `${currentUser} löst Prämie '${reward.name}' ein. Belastet: Konto ${scoreSource}. Kosten: ${reward.cost} (REWARD)`
+            });
+            
+            await save();
+            
+            renderShop();
+            if (currentUser !== 'Admin') renderDashboard(calculateTotalScore(currentUser));
+            
+            Swal.fire('Erfolgreich eingelöst!', `Der Lob-Stand von Konto ${scoreSource} wurde um ${reward.cost} reduziert.`, 'success');
+        } else {
+             Swal.fire('Fehlgeschlagen', 'Der Kontostand ist nicht ausreichend für diese Prämie.', 'error');
         }
-
-        userLogs.forEach(log => {
-            let color = log.msg.includes('lobt') ? 'var(--accent)' : (log.msg.includes('einlösen') ? 'var(--primary)' : 'var(--text-muted)');
-            let icon = log.msg.includes('lobt') ? '<i class="fas fa-hand-holding-heart"></i>' : (log.msg.includes('einlösen') ? '<i class="fas fa-shopping-basket"></i>' : '<i class="fas fa-info-circle"></i>');
-
-            let formattedMsg = log.msg.replace(/\(LOB\)/g, '').replace(/\(REWARD\)/g, '').trim();
-
-            logDiv.innerHTML += `
-                <div class="log-entry">
-                    <span style="color:var(--text-muted); font-size: 0.7rem;">${log.time}</span><br>
-                    <span style="color:${color};">${icon} ${formattedMsg}</span>
-                </div>
-            `;
-        });
     }
+
 
     // --- RANGLISTE ---
     function renderLeaderboard() {
         const leaderboardDiv = document.getElementById('leaderboard-list');
         leaderboardDiv.innerHTML = '';
         
-        // Erstelle eine Liste von Usern mit ihrem Gesamtscore
-        const rankedUsers = Object.keys(db.users).map(user => {
-            return {
-                name: user,
-                score: calculateTotalScore(user),
-                image: db.users[user].image
-            };
-        }).sort((a, b) => b.score - a.score);
+        // Filtere Admin aus der Rangliste
+        const rankedUsers = Object.keys(db.users)
+            .filter(user => user !== 'Admin') // NEU: Admin ausschließen
+            .map(user => {
+                return {
+                    name: user,
+                    score: calculateTotalScore(user),
+                    image: db.users[user].image
+                };
+            }).sort((a, b) => b.score - a.score);
 
         rankedUsers.forEach((u, index) => {
             const rank = index + 1;
@@ -941,66 +1089,94 @@
         });
     }
 
-    // --- PROFILE (MIT FILE UPLOAD) ---
+    // --- PROFILE ---
     function renderProfile(total) {
+        if (currentUser === 'Admin') return;
         document.getElementById('profile-avatar-preview').style.backgroundImage = `url('${db.users[currentUser].image}')`;
         renderBadges(currentUser);
     }
     
-    function saveAvatarFromURL() {
+    async function handleFileUpload(input) {
+         if (currentUser === 'Admin') return;
+         const file = input.files[0];
+         if (file) {
+             const reader = new FileReader();
+             reader.onload = async (e) => {
+                 db.users[currentUser].image = e.target.result;
+                 document.getElementById('profile-avatar-preview').style.backgroundImage = `url('${e.target.result}')`;
+                 await save();
+                 Swal.fire('Bild gespeichert!', 'Dein Profilbild wurde aktualisiert.', 'success');
+             };
+             reader.readAsDataURL(file);
+         }
+    }
+    
+    async function saveAvatarFromURL() {
+        if (currentUser === 'Admin') return;
         const url = document.getElementById('inp-avatar-url').value;
-        if (!url) {
-            Swal.fire({icon:'error', title:'Fehler', text:'Bitte eine gültige URL eingeben.', background:'#1a1a1a', color:'#fff'});
-            return;
+        if (url.startsWith('http')) {
+            db.users[currentUser].image = url;
+            document.getElementById('profile-avatar-preview').style.backgroundImage = `url('${url}')`;
+            await save();
+            Swal.fire('Bild gespeichert!', 'Dein Profilbild wurde aktualisiert.', 'success');
+        } else {
+             Swal.fire('Fehler', 'Bitte gib eine gültige URL ein (muss mit http beginnen).', 'error');
         }
-        db.users[currentUser].image = url;
-        save();
-        renderProfile(calculateTotalScore(currentUser));
-        Swal.fire({icon:'success', title:'URL gespeichert', background:'#1a1a1a', color:'#fff', timer:1500, showConfirmButton:false});
     }
-
-    function handleFileUpload(input) {
-        if (input.files && input.files[0]) {
-            const file = input.files[0];
-            
-            // Limitierung auf 500KB, da Base64 große Strings generiert
-            if (file.size > 500 * 1024) { 
-                 Swal.fire({icon:'error', title:'Datei zu groß', text:'Bitte wähle ein Bild kleiner als 500KB (aktuell: ' + (file.size / 1024).toFixed(1) + 'KB).', background:'#1a1a1a', color:'#fff'});
-                 return;
-            }
-            
-            const reader = new FileReader();
-            reader.onload = async function (e) {
-                // Speichere das Bild als Base64-String in der Datenbank
-                db.users[currentUser].image = e.target.result; 
-                await save();
-                renderProfile(calculateTotalScore(currentUser));
-                Swal.fire({icon:'success', title:'Bild aus Galerie gespeichert', background:'#1a1a1a', color:'#fff', timer:1500, showConfirmButton:false});
-            };
-            reader.readAsDataURL(file);
+    
+    async function savePass() {
+        if (currentUser === 'Admin') return;
+        const newPass = document.getElementById('inp-pass').value;
+        if (newPass.length >= 4) {
+             db.users[currentUser].password = newPass;
+             document.getElementById('inp-pass').value = '';
+             await save();
+             Swal.fire('Erfolg', 'Passwort wurde aktualisiert.', 'success');
+        } else {
+             Swal.fire('Fehler', 'Passwort muss mindestens 4 Zeichen lang sein.', 'error');
         }
     }
 
-    function savePass() {
-        const pass = document.getElementById('inp-pass').value;
-        if (pass.length < 3) {
-            Swal.fire({icon:'error', title:'Fehler', text:'Passwort muss mindestens 3 Zeichen lang sein.', background:'#1a1a1a', color:'#fff'});
-            return;
-        }
-        db.users[currentUser].password = pass;
-        save();
-        document.getElementById('inp-pass').value = '';
-        Swal.fire({icon:'success', title:'Passwort gespeichert', background:'#1a1a1a', color:'#fff', timer:1500, showConfirmButton:false});
-    }
 
     // --- ADMIN FUNKTIONEN ---
     function renderAdmin() {
+        // NEU: Admin Lob Status aktualisieren
+        document.getElementById('admin-lob-status').innerText = `Aktueller Lob-Stand: ${db.users['Admin'].adminLobs}`;
+        
         renderRewardList();
         renderLogList();
-        renderAdminUsers(); // NEU: Benutzerverwaltung rendern
+        renderAdminUsers();
+        
+        // Admin kann auch Lob verteilen, daher render Lob-Liste
+        const list = document.getElementById('lob-list');
+        list.innerHTML = '';
+        Object.keys(db.users).forEach(u => {
+            if(u !== 'Admin') { // Admin kann sich nicht selbst loben
+                list.innerHTML += `
+                    <div class="lob-target-btn" onclick="openLobMenu('${u}')">
+                        <div class="avatar" style="background-image:url('${db.users[u].image}'); width:50px; height:50px; margin-right: 15px;"></div>
+                        <div class="btn-info">
+                            <div class="btn-name">${u}</div>
+                            <div class="btn-action">Tippen zum Loben (Admin)</div>
+                        </div>
+                        <i class="fas fa-chevron-right" style="color:#444; margin-left: auto;"></i>
+                    </div>
+                `;
+            }
+        });
+    }
+    
+    // NEU: Super-Lob setzen
+    async function setAdminSuperLobs() {
+        const SUPER_LOBS = 9999;
+        db.users['Admin'].adminLobs = SUPER_LOBS;
+        await save();
+        renderAdmin();
+        Swal.fire({icon:'success', title:'Super-Lobs gesetzt', text:`Admin hat nun ${SUPER_LOBS} Lobs zum Testen.`, background:'#1a1a1a', color:'#fff', timer:2000, showConfirmButton:false});
     }
 
-    function renderAdminUsers() { // NEU: Funktion zur Benutzerverwaltung
+
+    function renderAdminUsers() {
         const listDiv = document.getElementById('admin-user-list');
         listDiv.innerHTML = '<h4>Profilbilder bearbeiten</h4>';
 
@@ -1017,7 +1193,7 @@
         });
     }
 
-    async function adminEditUser(targetUser) { // NEU: Admin kann Bild ändern
+    async function adminEditUser(targetUser) {
         const userImage = db.users[targetUser].image;
 
         const { value: url } = await Swal.fire({
@@ -1025,7 +1201,6 @@
             html: `
                 <div class="avatar" style="background-image:url('${userImage}'); width:100px; height:100px; margin: 10px auto;"></div>
                 <input id="swal-url" type="text" class="swal2-input" placeholder="Neue Bild-URL (http://...)" value="${userImage.startsWith('data:image') ? '' : userImage}">
-                <p style="font-size:0.8rem; color:var(--text-muted); margin-top:10px;">Wenn Base64 verwendet wird, ist das Feld leer. Bitte URL manuell eingeben.</p>
             `,
             focusConfirm: false, background: '#1a1a1a', color: '#fff', confirmButtonColor: '#ff4d6d',
             preConfirm: () => document.getElementById('swal-url').value
@@ -1034,7 +1209,14 @@
         if (url) {
             db.users[targetUser].image = url;
             await save();
-            renderAdminUsers(); // Liste aktualisieren
+            renderAdminUsers();
+            // Aktualisiere Ansicht, falls Admin das eigene Bild ändert
+            if (currentUser === targetUser) {
+                document.getElementById('header-username').innerText = targetUser; // Refresh
+                if (document.getElementById('tab-profile').classList.contains('hidden') === false) {
+                     renderProfile(calculateTotalScore(currentUser));
+                }
+            }
             Swal.fire('Erfolgreich', `Profilbild für ${targetUser} aktualisiert.`, 'success');
         } else if (url === '') {
              Swal.fire('Abgebrochen', `Keine URL eingegeben.`, 'info');
@@ -1067,7 +1249,7 @@
         }
 
         const newId = db.rewards.length > 0 ? Math.max(...db.rewards.map(r => r.id)) + 1 : 1;
-        db.rewards.push({ id: newId, name, cost });
+        db.rewards.push({ id: newId, name, cost, desc: 'Admin hinzugefügt.' }); // Füge leere Beschreibung hinzu
         db.rewards.sort((a,b) => a.cost - b.cost); 
         
         document.getElementById('adm-rew-name').value = '';
@@ -1106,15 +1288,70 @@
         }
 
         filteredLogs.forEach(log => {
+            const isLob = log.msg.includes('(LOB)');
+            const logId = log.id;
+            
             logDiv.innerHTML += `
                 <div class="log-entry">
-                    <span style="color:var(--text-muted); font-size: 0.7rem;">${log.time}</span><br>
-                    ${log.msg}
+                    <div class="log-content">
+                        <span style="color:var(--text-muted); font-size: 0.7rem;">${log.time}</span><br>
+                        ${log.msg.replace(/\(LOB\)/g, '').replace(/\(REWARD\)/g, '').replace(/\(ADMIN\)/g, '').trim()}
+                    </div>
+                    ${isLob ? `<button class="btn-delete-log" onclick="adminWithdrawLob(${logId})">Rückzug</button>` : ''}
                 </div>
             `;
         });
     }
     
+    // NEU: Funktion zum Rückziehen des Lobs
+    async function adminWithdrawLob(logId) {
+        const logEntry = db.logs.find(l => l.id == logId);
+        
+        if (!logEntry || !logEntry.sender || !logEntry.receiver || typeof logEntry.amount === 'undefined') {
+            Swal.fire('Fehler', 'Log-Eintrag kann nicht zurückgezogen werden (fehlende Daten).', 'error');
+            return;
+        }
+
+        const { isConfirmed } = await Swal.fire({
+            title: 'Lob Rückzug bestätigen',
+            text: `Soll Lob von ${logEntry.sender} an ${logEntry.receiver} in Höhe von ${logEntry.amount} Punkten wirklich zurückgezogen werden?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'JA, zurückziehen',
+            confirmButtonColor: 'var(--danger)',
+            cancelButtonText: 'Abbrechen'
+        });
+
+        if (isConfirmed) {
+            
+            // 1. Punkte zurückbuchen 
+            // Wichtig: Der Empfänger hat Lob von "Admin" oder vom eigentlichen "currentUser" erhalten.
+            const senderKey = logEntry.sender === 'Admin' ? 'Admin' : logEntry.sender;
+            
+            if (logEntry.receiver !== 'Admin' && db.users[logEntry.receiver].received[senderKey]) {
+                const currentScore = db.users[logEntry.receiver].received[senderKey] || 0;
+                const newScore = Math.max(0, currentScore - logEntry.amount);
+                db.users[logEntry.receiver].received[senderKey] = newScore;
+            }
+            
+            // 2. Log löschen
+            db.logs = db.logs.filter(l => l.id !== logId);
+            
+            // 3. Neuen Log-Eintrag hinzufügen
+            db.logs.unshift({
+                id: Date.now(),
+                time: new Date().toLocaleString(),
+                msg: `ADMIN zog ${logEntry.amount} Lobs von ${logEntry.sender} an ${logEntry.receiver} zurück. (ADMIN)`
+            });
+
+            await save();
+            renderAdmin(); // Admin Ansicht aktualisieren
+            
+            Swal.fire('Erfolgreich', 'Lob wurde zurückgezogen und Log gelöscht.', 'success');
+        }
+    }
+
+
     function fireConfetti(count) {
         confetti({
             particleCount: count,
