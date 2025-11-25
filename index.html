@@ -176,6 +176,9 @@
         .score-display-small.thomas {
             border-left-color: #00bcd4; /* Türkis für Thomas */
         }
+        .score-display-small.emil {
+            border-left-color: #ff9900; /* Gold/Orange für Emil */
+        }
     </style>
 </head>
 <body>
@@ -208,15 +211,9 @@
                     <div id="badge-display" style="margin-top:20px; font-size:2rem; color:white;"></div>
                 </div>
                 
-                <div class="section-header" style="margin-top: 5px;">Deine Verfügbaren Shop-Konten</div>
-                <div class="score-display-small">
-                    <div><i class="fas fa-user" style="color: gold;"></i> Konto Emil</div>
-                    <div id="home-emil-score">0</div>
-                </div>
-                <div class="score-display-small thomas">
-                    <div><i class="fas fa-user-circle" style="color: #00bcd4;"></i> Konto Thomas</div>
-                    <div id="home-thomas-score">0</div>
-                </div>
+                <div class="section-header" style="margin-top: 5px;">Deine Separaten Lob-Konten</div>
+                <div id="home-separate-scores">
+                    </div>
 
 
                 <div id="reward-tracking-box" class="reward-progress hidden">
@@ -246,14 +243,8 @@
             
             <div id="tab-shop" class="fade-in hidden">
                 <div class="section-header">Deine Separaten Lob-Konten</div>
-                <div class="score-display-small">
-                    <div><i class="fas fa-user" style="color: gold;"></i> Konto Emil</div>
-                    <div id="shop-emil-score">0</div>
-                </div>
-                <div class="score-display-small thomas">
-                    <div><i class="fas fa-user-circle" style="color: #00bcd4;"></i> Konto Thomas</div>
-                    <div id="shop-thomas-score">0</div>
-                </div>
+                <div id="shop-separate-scores">
+                    </div>
 
                 <div class="section-header" style="margin-top: 40px;">Verfügbare Prämien</div>
                 <div id="shop-reward-list">
@@ -332,17 +323,38 @@
 
 <script>
     // --- CONFIG & STATE ---
-    const API_URL = 'http://localhost:3000';
+    // WICHTIG: Ersetzen Sie DIESE URL durch die URL Ihres Render-Dienstes (z.B. https://ihre-app.onrender.com)
+    // Wenn Sie die App lokal laufen lassen, nutzen Sie: 'http://localhost:3000'
+    const API_URL = 'https://lobapp-server.onrender.com'; 
     const MASKOTTCHEN_ICON = '<i class="fas fa-hiking"></i>';
     
-    // DEFINITION DER ZU TRENNENDEN KONTEN (Namen der Sender)
-    const SEPARATE_ACCOUNTS = ['Emil', 'Thomas']; 
-
+    // DEFINITION DER STANDARDDATEN
     const DEFAULT_DB = {
         users: {
-            "Thomas": { password: "nacke", image: "https://api.dicebear.com/7.x/notionists/svg?seed=Thomas", lastSeenScore: 0, received: { "Emil": 0, "Marius": 0 }, badges: [] },
-            "Emil":   { password: "nacke", image: "https://api.dicebear.com/7.x/notionists/svg?seed=Emil", lastSeenScore: 0, received: { "Thomas": 0, "Marius": 0 }, badges: [] },
-            "Marius": { password: "nacke", image: "https://api.dicebear.com/7.x/notionists/svg?seed=Marius", lastSeenScore: 0, received: { "Thomas": 0, "Emil": 0 }, badges: [] } 
+            "Thomas": { 
+                password: "nacke", 
+                image: "https://api.dicebear.com/7.x/notionists/svg?seed=Thomas", 
+                lastSeenScore: 0, 
+                // Thomas empfängt Lob von EMIL und MARIUS.
+                received: { "Emil": 0, "Marius": 0 }, 
+                badges: [] 
+            },
+            "Emil":   { 
+                password: "nacke", 
+                image: "https://api.dicebear.com/7.x/notionists/svg?seed=Emil", 
+                lastSeenScore: 0, 
+                // Emil empfängt Lob von THOMAS und MARIUS.
+                received: { "Thomas": 0, "Marius": 0 }, 
+                badges: [] 
+            },
+            "Marius": { 
+                password: "nacke", 
+                image: "https://api.dicebear.com/7.x/notionists/svg?seed=Marius", 
+                lastSeenScore: 0, 
+                // Marius empfängt Lob von THOMAS und EMIL.
+                received: { "Thomas": 0, "Emil": 0 }, 
+                badges: [] 
+            } 
         },
         logs: [],
         rewards: [
@@ -383,13 +395,10 @@
             if(typeof db.users[u].autoLogin === 'undefined') db.users[u].autoLogin = false;
             if(typeof db.users[u].badges === 'undefined') db.users[u].badges = [];
             
-            // Sicherstellen, dass alle SEPARATE_ACCOUNTS im 'received' Objekt des Empfängers existieren
-            SEPARATE_ACCOUNTS.forEach(sender => {
-                if(typeof db.users[u].received === 'undefined') db.users[u].received = {};
-                if(typeof db.users[u].received[sender] === 'undefined') {
-                    db.users[u].received[sender] = 0;
-                }
-            });
+            // Stellt sicher, dass das received-Objekt existiert, falls es fehlt
+            if(typeof db.users[u].received === 'undefined') {
+                db.users[u].received = {};
+            }
 
             // Entferne alte, nicht mehr verwendete Felder
             if(typeof db.users[u].group !== 'undefined') delete db.users[u].group;
@@ -431,9 +440,21 @@
         return total; 
     }
 
-    function getSenderScore(user, sender) {
-        if (!db.users[user] || !db.users[user].received) return 0;
-        return db.users[user].received[sender] || 0;
+    function getRelevantScores(user) {
+        if (!db.users[user] || !db.users[user].received) return [];
+
+        // Gehe alle erhaltenen Konten durch und ignoriere den Benutzer selbst
+        const relevantScores = Object.entries(db.users[user].received)
+            .filter(([senderName, score]) => senderName !== user) 
+            .map(([senderName, score]) => ({
+                name: senderName,
+                score: score,
+                // Hilfsklasse für Thomas/Emil-Farben
+                cssClass: senderName === 'Thomas' ? 'thomas' : (senderName === 'Emil' ? 'emil' : '')
+            }));
+
+        // Sortiere nach Name für konsistente Anzeige (z.B. Emil vor Marius)
+        return relevantScores.sort((a, b) => a.name.localeCompare(b.name));
     }
     
     // --- HELPER FUNKTIONEN (Visuals, Login, Navigation etc.) ---
@@ -453,7 +474,6 @@
                 newBadge = true;
                 Swal.fire({
                     title: 'Neues Abzeichen!', 
-                    // Wichtig: HTML statt nur Text, um den $ Fehler zu umgehen
                     html: `Du hast das Abzeichen <b>"${badge.name}"</b> freigeschaltet! <span style="color: var(--accent);">${badge.icon}</span>`,
                     icon: 'success', background: '#1a1a1a', color: '#fff', confirmButtonColor: '#ff4d6d'
                 });
@@ -619,18 +639,15 @@
 
         if(currentUser !== 'Admin') {
             const total = calculateTotalScore(currentUser);
-            // KORRIGIERT: Abrufen der Sender-Konten dynamisch
-            const emilScore = getSenderScore(currentUser, 'Emil');
-            const thomasScore = getSenderScore(currentUser, 'Thomas');
             
             if(tab === 'activity') {
                 // Setze gelesene Lobs zurück, wenn Aktivitäts-Tab geöffnet wird
                 unreadLobs = 0;
                 updateActivityBadge();
             }
-            if(tab === 'home') renderDashboard(total, emilScore, thomasScore); 
+            if(tab === 'home') renderDashboard(total); 
             if(tab === 'activity') renderActivity();
-            if(tab === 'shop') renderShop(emilScore, thomasScore); 
+            if(tab === 'shop') renderShop(); 
             if(tab === 'profile') renderProfile(total);
         }
 
@@ -639,13 +656,33 @@
     }
 
     // --- DASHBOARD (HOME) ---
-    function renderDashboard(total, emilScore, thomasScore) {
+    function renderDashboard(total) {
         document.getElementById('score-display').innerText = total;
-        // KORRIGIERT: Anzeige der spezifischen Konten
-        document.getElementById('home-emil-score').innerText = emilScore;
-        document.getElementById('home-thomas-score').innerText = thomasScore;
-        
         renderBadges(currentUser);
+        
+        // 🎯 DYNAMISCHES RENDERING DER KONTEN
+        const relevantScores = getRelevantScores(currentUser);
+        const homeScoresDiv = document.getElementById('home-separate-scores');
+        homeScoresDiv.innerHTML = '';
+        
+        let maxScore = total; // Bester Score zur Berechnung der nächsten Prämie
+        
+        if (relevantScores.length > 0) {
+            relevantScores.forEach(s => {
+                // Setze den höchsten Einzelscore für das Prämien-Tracking
+                if (s.score > maxScore) maxScore = s.score; 
+
+                // HTML-Rendering für die Kontostandsanzeige
+                homeScoresDiv.innerHTML += `
+                    <div class="score-display-small ${s.cssClass}">
+                        <div><i class="fas fa-user${s.cssClass === 'thomas' ? '-circle' : ''}" style="color: ${s.cssClass === 'thomas' ? '#00bcd4' : (s.cssClass === 'emil' ? '#ff9900' : 'gold')};"></i> Konto ${s.name}</div>
+                        <div>${s.score}</div>
+                    </div>
+                `;
+            });
+        } else {
+             homeScoresDiv.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 10px;">Noch keine individuellen Konten gefüllt.</div>`;
+        }
         
         const list = document.getElementById('lob-list');
         list.innerHTML = '';
@@ -664,8 +701,7 @@
             }
         });
         
-        // Belohnungs-Tracking (basiert auf dem höchsten verfügbaren Einzelkonto für die nächste Prämie)
-        const maxScore = Math.max(emilScore, thomasScore, total); 
+        // Belohnungs-Tracking (basiert auf dem höchsten verfügbaren Einzelkonto oder Gesamtscore)
         const nextReward = db.rewards.find(r => r.cost > maxScore);
         const rewardBox = document.getElementById('reward-tracking-box');
         
@@ -731,24 +767,36 @@
         });
     }
 
-    // --- SHOP (KORRIGIERT) ---
-    function renderShop(emilScore, thomasScore) {
-        // KORRIGIERT: Anzeige der spezifischen Konten
-        document.getElementById('shop-emil-score').innerText = emilScore;
-        document.getElementById('shop-thomas-score').innerText = thomasScore;
+    // --- SHOP ---
+    function renderShop() {
+        const relevantScores = getRelevantScores(currentUser);
+        const shopScoresDiv = document.getElementById('shop-separate-scores');
+        shopScoresDiv.innerHTML = '';
+        
+        let highestAvailableScore = 0;
+        
+        if (relevantScores.length > 0) {
+            relevantScores.forEach(s => {
+                if (s.score > highestAvailableScore) highestAvailableScore = s.score;
+                
+                shopScoresDiv.innerHTML += `
+                    <div class="score-display-small ${s.cssClass}">
+                        <div><i class="fas fa-user${s.cssClass === 'thomas' ? '-circle' : ''}" style="color: ${s.cssClass === 'thomas' ? '#00bcd4' : (s.cssClass === 'emil' ? '#ff9900' : 'gold')};"></i> Konto ${s.name}</div>
+                        <div>${s.score}</div>
+                    </div>
+                `;
+            });
+        } else {
+             shopScoresDiv.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 10px;">Keine Shop-Konten vorhanden.</div>`;
+        }
 
         const shopDiv = document.getElementById('shop-reward-list');
         shopDiv.innerHTML = '';
 
-        const accountScores = { 'Emil': emilScore, 'Thomas': thomasScore };
-
         db.rewards.forEach(r => {
-            const canAffordEmil = emilScore >= r.cost;
-            const canAffordThomas = thomasScore >= r.cost;
-            const canAfford = canAffordEmil || canAffordThomas;
+            const canAfford = highestAvailableScore >= r.cost;
             
-            const highestAvailable = Math.max(emilScore, thomasScore);
-            const buttonText = canAfford ? 'Einlösen' : `Fehlen ${r.cost - highestAvailable}`;
+            const buttonText = canAfford ? 'Einlösen' : `Fehlen ${r.cost - highestAvailableScore}`;
             const buttonColor = canAfford ? 'var(--primary)' : '#444';
 
             shopDiv.innerHTML += `
@@ -761,7 +809,7 @@
                         ${r.cost} <i class="fas fa-star" style="color:gold; margin-left: 5px;"></i>
                     </div>
                     <button class="btn-main" style="width:100px; padding:10px; margin-left:15px; background:${buttonColor};" 
-                            ${canAfford ? `onclick="redeemReward(${r.id}, ${emilScore}, ${thomasScore})"` : 'disabled'}>
+                            ${canAfford ? `onclick="redeemReward(${r.id})"` : 'disabled'}>
                         ${buttonText}
                     </button>
                 </div>
@@ -769,18 +817,26 @@
         });
     }
 
-    async function redeemReward(id, emilScore, thomasScore) {
+    async function redeemReward(id) {
         const reward = db.rewards.find(r => r.id === id);
+        const relevantScores = getRelevantScores(currentUser);
         
         const options = {};
-        if (emilScore >= reward.cost) {
-            options['Emil'] = `Konto Emil (${emilScore} Lobs)`;
-        }
-        if (thomasScore >= reward.cost) {
-            options['Thomas'] = `Konto Thomas (${thomasScore} Lobs)`;
+        let eligibleScores = 0;
+
+        relevantScores.forEach(s => {
+            if (s.score >= reward.cost) {
+                options[s.name] = `Konto ${s.name} (${s.score} Lobs)`;
+                eligibleScores++;
+            }
+        });
+
+        if (eligibleScores === 0) {
+             Swal.fire('Fehlgeschlagen', 'Kein Konto hat genügend Lobs für diese Prämie.', 'error');
+             return;
         }
 
-        // Auswahl des Kontos (Emil oder Thomas)
+        // Auswahl des Kontos
         const { value: scoreSource } = await Swal.fire({
             title: `Prämie: ${reward.name} (${reward.cost} Lobs)`,
             text: `Wähle das Konto, das die ${reward.cost} Lobs bezahlen soll:`,
@@ -798,8 +854,7 @@
         });
         
         if (scoreSource) {
-            // scoreSource ist 'Emil' oder 'Thomas'
-            const currentScore = getSenderScore(currentUser, scoreSource);
+            const currentScore = db.users[currentUser].received[scoreSource];
             
             if (currentScore >= reward.cost) {
                 // Deduktion vom spezifischen Sender-Konto
@@ -812,13 +867,9 @@
                 
                 await save();
                 
-                // Scores neu berechnen und Shop/Dashboard neu rendern
-                const newEmilScore = getSenderScore(currentUser, 'Emil');
-                const newThomasScore = getSenderScore(currentUser, 'Thomas');
-                
                 // Update der Ansichten
-                renderShop(newEmilScore, newThomasScore);
-                renderDashboard(calculateTotalScore(currentUser), newEmilScore, newThomasScore);
+                renderShop();
+                renderDashboard(calculateTotalScore(currentUser));
                 
                 Swal.fire('Erfolgreich eingelöst!', `Der Lob-Stand von Konto ${scoreSource} wurde um ${reward.cost} reduziert.`, 'success');
             } else {
@@ -893,7 +944,6 @@
     // --- PROFILE (MIT FILE UPLOAD) ---
     function renderProfile(total) {
         document.getElementById('profile-avatar-preview').style.backgroundImage = `url('${db.users[currentUser].image}')`;
-        // document.getElementById('inp-avatar-url').value = ''; // Optional: URL-Feld leeren
         renderBadges(currentUser);
     }
     
