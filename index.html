@@ -227,7 +227,7 @@
 
         /* --- NAVIGATION BAR --- */
         .nav-bar {
-            position: sticky;
+            position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
@@ -718,6 +718,18 @@
                         speichern</button>
                 </div>
 
+                <div class="settings-card">
+                    <h4 style="margin-top:0;"><i class="fas fa-image"></i> App Icon (Favicon)</h4>
+                    <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:10px;">Bild aus Galerie wählen
+                        (wird oben im Browser-Tab angezeigt)</p>
+                    <input type="file" id="favicon-upload" accept="image/*" style="display:none;"
+                        onchange="changeFavicon(this)">
+                    <button class="btn-main" style="background: #444;"
+                        onclick="document.getElementById('favicon-upload').click()">Bild auswählen</button>
+                    <button class="btn-main" style="background: var(--danger); margin-top:5px;"
+                        onclick="resetFavicon()">Zurücksetzen</button>
+                </div>
+
                 <div class="section-header">Super-User Steuerung</div>
                 <div class="settings-card admin-super-user">
                     <p style="font-size:0.9rem; color: #00bcd4; font-weight: bold;"><i class="fas fa-magic"></i> Admin
@@ -880,7 +892,10 @@
                 { threshold: 10, name: "Starter-Rucksack", icon: 'fa-walking', color: '#4CAF50', desc: '10 Lobs sammeln' },
                 { threshold: 50, name: "Erfahrener Backpacker", icon: 'fa-map-marked-alt', color: '#2196F3', desc: '50 Lobs sammeln' },
                 { threshold: 100, name: "Gipfelstürmer", icon: 'fa-hiking', color: '#FF9800', desc: '100 Lobs sammeln' }
-            ]
+            ],
+            appSettings: {
+                favicon: ''
+            }
         };
 
         let db = null;
@@ -936,6 +951,14 @@
             // Badge-Definitionen initialisieren
             if (!db.badgeDefinitions || !Array.isArray(db.badgeDefinitions)) {
                 db.badgeDefinitions = DEFAULT_DB.badgeDefinitions;
+            }
+
+            // App Settings initialisieren
+            if (!db.appSettings) {
+                db.appSettings = DEFAULT_DB.appSettings;
+            }
+            if (db.appSettings.favicon) {
+                updateFavicon(db.appSettings.favicon);
             }
 
             // Admin-Konto aus der Login-Grid entfernen, wenn es existiert
@@ -1917,6 +1940,45 @@
             }
         }
 
+
+        // Favicon Funktionen
+        function updateFavicon(url) {
+            let link = document.querySelector("link[rel~='icon']");
+            if (!link) {
+                link = document.createElement('link');
+                link.rel = 'icon';
+                document.getElementsByTagName('head')[0].appendChild(link);
+            }
+            link.href = url;
+        }
+
+        async function changeFavicon(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = async function (e) {
+                    const base64 = e.target.result;
+
+                    // Initialisiere appSettings falls nicht vorhanden
+                    if (!db.appSettings) db.appSettings = {};
+
+                    db.appSettings.favicon = base64;
+                    await save();
+                    updateFavicon(base64);
+                    Swal.fire('Erfolg', 'App Icon wurde aktualisiert.', 'success');
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        async function resetFavicon() {
+            if (db.appSettings) {
+                db.appSettings.favicon = '';
+                await save();
+                // Standard Favicon oder leer
+                updateFavicon('');
+                Swal.fire('Zurückgesetzt', 'App Icon wurde zurückgesetzt.', 'success');
+            }
+        }
 
         // --- ADMIN FUNKTIONEN ---
         function renderAdmin() {
