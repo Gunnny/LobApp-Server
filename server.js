@@ -155,6 +155,16 @@ app.post('/update', (req, res) => {
 // --- SERVER START ---
 loadDatabase(); // Lade die DB vor dem Start
 
+// server.js (Code ZUSÄTZLICH einfügen)
+
+// NEUER ENDPUNKT FÜR DIE STARTSEITE
+app.get('/', (req, res) => {
+    // Sende die index.html Datei als Antwort
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// app.listen(PORT, ...); // Der Server-Start-Befehl bleibt unverändert
+
 app.listen(PORT, () => {
     console.log(`Server läuft auf http://localhost:${PORT}`);
     console.log('Wichtig: Server muss laufen, damit das Frontend im Online-Modus funktioniert.');
