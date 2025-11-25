@@ -2,16 +2,19 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const fs = require('fs');
-const path = require('path');
+const path = require('path'); // WICHTIG: Pfad-Modul
 
 const app = express();
 const PORT = 3000;
 const DB_FILE = path.join(__dirname, 'database.json');
 
 // --- Middleware ---
-// Wichtig: Limit muss für Base64-Bilder erhöht werden (hier 5MB)
+// Wichtig: Limit muss für Base64-Bilder erhöht werden
 app.use(cors()); 
 app.use(bodyParser.json({ limit: '5mb' })); 
+
+// 🎯 NEU: ERMÖGLICHT DEN ZUGRIFF AUF index.html BEI DER BASIS-URL (/)
+app.use(express.static(path.join(__dirname, '/'))); 
 
 // --- DB Lese/Schreib Funktionen ---
 
@@ -66,5 +69,4 @@ app.post('/update', (req, res) => {
 // --- Server starten ---
 app.listen(PORT, () => {
     console.log(`🚀 Lob App Server läuft auf http://localhost:${PORT}`);
-    console.log(`Stelle sicher, dass database.json existiert oder erstellt wird.`);
 });
