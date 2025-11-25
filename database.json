@@ -1,0 +1,52 @@
+{
+  "users": {
+    "Thomas": {
+      "password": "nacke",
+      "image": "https://api.dicebear.com/7.x/notionists/svg?seed=Thomas",
+      "lastSeenScore": 0,
+      "received": {
+        "Emil": 100,
+        "Marius": 1000
+      },
+      "badges": []
+    },
+    "Emil": {
+      "password": "nacke",
+      "image": "https://api.dicebear.com/7.x/notionists/svg?seed=Emil",
+      "lastSeenScore": 0,
+      "received": {
+        "Thomas": 0,
+        "Marius": 0
+      },
+      "badges": []
+    },
+    "Marius": {
+      "password": "nacke",
+      "image": "https://api.dicebear.com/7.x/notionists/svg?seed=Marius",
+      "lastSeenScore": 0,
+      "received": {
+        "Thomas": 0,
+        "Emil": 0
+      },
+      "badges": []
+    }
+  },
+  "logs": [],
+  "rewards": [
+    {
+      "id": 1,
+      "name": "Kaffeepause gespendet",
+      "cost": 20
+    },
+    {
+      "id": 2,
+      "name": "Pizza-Mittagessen",
+      "cost": 50
+    },
+    {
+      "id": 3,
+      "name": "Extra Urlaubstag",
+      "cost": 100
+    }
+  ]
+}
