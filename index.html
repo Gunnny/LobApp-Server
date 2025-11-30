@@ -625,6 +625,12 @@
             box-shadow: 0 4px 20px var(--primary-glow);
         }
 
+        .shop-item-card.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(100%);
+        }
+
         .shop-icon {
             font-size: 3rem;
             color: var(--accent);
@@ -636,11 +642,6 @@
             color: gold;
             font-size: 1.1rem;
             margin-top: 5px;
-        }
-
-        .shop-item-card.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
         }
 
         /* Style für die spezifischen Kontostände (Home/Shop) */
@@ -689,14 +690,16 @@
 
         /* --- CASINO --- */
         .account-select-card {
-            opacity: 0.4;
-            border: 1px solid #333;
-            transform: scale(0.95);
+            opacity: 1;
+            border: 1px solid #555;
+            transform: scale(1);
             transition: all 0.2s;
         }
 
         .account-select-card:hover {
-            opacity: 0.7;
+            transform: scale(1.03);
+            box-shadow: 0 4px 15px rgba(255, 77, 109, 0.2);
+            border-color: var(--primary);
         }
 
         .account-select-card.active {
@@ -1113,10 +1116,12 @@
 
             <div id="tab-log-admin" class="fade-in hidden">
                 <div class="section-header">System Protokoll & Lob-Rückzug</div>
-                <div class="admin-filter-bar" style="margin-bottom: 15px;">
+                <div class="admin-filter-bar">
                     <button id="filter-all" class="active" onclick="setLogFilter('ALL')">Alle</button>
-                    <button id="filter-lob" onclick="setLogFilter('LOB')">Lob-Aktionen</button>
-                    <button id="filter-reward" onclick="setLogFilter('REWARD')">Shop-Aktionen</button>
+                    <button id="filter-lob" onclick="setLogFilter('LOB')">Lobs</button>
+                    <button id="filter-reward" onclick="setLogFilter('REWARD')">Prämien</button>
+                    <button id="filter-admin" onclick="setLogFilter('ADMIN')">Admin</button>
+                    <button id="filter-casino" onclick="setLogFilter('CASINO')">Casino</button>
                 </div>
                 <div id="log-list" style="max-height: 400px; overflow-y: auto;"></div>
             </div>
@@ -1278,11 +1283,18 @@
                             <div style="font-size:0.8rem; color:var(--text-muted); margin-top:5px;">Einsatz: Variabel
                             </div>
                         </div>
-                        <!-- Sports Betting -->
-                        <div class="game-card" onclick="openSportsBetting()">
+                        <!-- Sports Betting (TestUser only) / Coming Soon -->
+                        <div class="game-card" id="sports-betting-card" onclick="openSportsBetting()"
+                            style="display:none;">
                             <div class="game-icon" style="color:#4CAF50;"><i class="fas fa-futbol"></i></div>
                             <div class="game-title">Sportwetten</div>
                             <div style="font-size:0.8rem; color:var(--text-muted); margin-top:5px;">Live Fußball Wetten
+                            </div>
+                        </div>
+                        <div class="game-card disabled" id="sports-betting-coming-soon" style="display:none;">
+                            <div class="game-icon"><i class="fas fa-question"></i></div>
+                            <div class="game-title">Coming Soon</div>
+                            <div style="font-size:0.8rem; color:var(--text-muted); margin-top:5px;">Bald verfügbar
                             </div>
                         </div>
                         <!-- Coming Soon -->
@@ -1495,111 +1507,181 @@
                     </div>
                 </div>
 
-                <!-- COIN FLIP GAME -->
-                <div id="coinflip-game" class="hidden">
-                    <div class="section-header"
-                        style="display:flex; justify-content:space-between; align-items:center;">
-                        <div style="display:flex; align-items:center; gap:10px;">
+
+                <!-- COIN FLIP GAME (Double or Nothing) -->
+                <div id="coin-flip-view" class="hidden"
+                    style="position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.95); z-index:1000; overflow-y:auto;">
+                    <div class="game-container" style="max-width:600px; margin:50px auto; padding:20px;">
+                        <div class="section-header"
+                            style="display:flex; justify-content:space-between; align-items:center;">
                             <span>Doppelt oder Nichts</span>
-                            <div id="cf-account-info"
-                                style="font-size:0.8rem; color:gold; background:rgba(255, 215, 0, 0.1); padding:4px 8px; border-radius:6px; border:1px solid rgba(255, 215, 0, 0.3);">
-                            </div>
+                            <button onclick="exitCoinFlip()"
+                                style="background:none; border:none; color:var(--text-muted); cursor:pointer;">Beenden
+                                <i class="fas fa-times"></i></button>
                         </div>
-                        <button onclick="exitCoinFlip()"
-                            style="background:none; border:none; color:var(--text-muted); cursor:pointer;">Beenden <i
+
+                        <div id="cf-setup" style="text-align:center; padding:20px;">
+                            <i class="fas fa-coins" style="font-size:3rem; color:gold; margin-bottom:20px;"></i>
+                            <p style="color:#ccc; margin-bottom:20px;">Setze einen Betrag. Wenn du gewinnst, verdoppelst
+                                du ihn. Wenn du verlierst, ist er weg.</p>
+                            <input type="number" id="cf-bet-input" placeholder="Einsatz"
+                                style="padding:10px; border-radius:5px; border:1px solid #444; background:#222; color:white; width:150px; text-align:center; margin-bottom:15px;">
+                            <br>
+                            <button class="btn-main" onclick="startCoinFlip()"
+                                style="background:var(--primary); width:150px;">Starten</button>
+                        </div>
+
+                        <div id="cf-game" class="hidden">
+                            <div style="font-size:1.5rem; color:gold; margin-bottom:10px;">Pot: <span
+                                    id="cf-current-pot">0</span> Chips</div>
+
+                            <div class="coin-container" onclick="flipCoin('random')">
+                                <!-- Click to flip for fun? No, logic needs choice -->
+                                <div id="cf-coin" class="coin">
+                                    <div class="coin-face coin-front"><i class="fas fa-user-astronaut"></i></div>
+                                    <div class="coin-face coin-back">1</div>
                                 </div>
-                    </div>
-
-                    <div id="cf-setup" style="text-align:center; padding:20px;">
-                        <i class="fas fa-coins" style="font-size:3rem; color:gold; margin-bottom:20px;"></i>
-                        <p style="color:#ccc; margin-bottom:20px;">Setze einen Betrag. Wenn du gewinnst, verdoppelst du
-                            ihn.
-                            Wenn du verlierst, ist er weg.</p>
-                        <input type="number" id="cf-bet-input" placeholder="Einsatz"
-                            style="padding:10px; border-radius:5px; border:1px solid #444; background:#222; color:white; width:150px; text-align:center; margin-bottom:15px;">
-                        <br>
-                        <button class="btn-main" onclick="startCoinFlip()"
-                            style="background:var(--primary); width:150px;">Starten</button>
-                    </div>
-
-                    <div id="cf-game" class="hidden">
-                        <div style="font-size:1.5rem; color:gold; margin-bottom:10px;">Pot: <span
-                                id="cf-current-pot">0</span> Chips</div>
-
-                        <div class="coin-container" onclick="flipCoin('random')">
-                            <!-- Click to flip for fun? No, logic needs choice -->
-                            <div id="cf-coin" class="coin">
-                                <div class="coin-face coin-front"><i class="fas fa-user-astronaut"></i></div>
-                                <div class="coin-face coin-back">1</div>
                             </div>
-                        </div>
 
-                        <div id="cf-message" style="margin:20px 0; font-weight:bold; min-height:24px;">Kopf oder
-                            Zahl?</div>
+                            <div id="cf-message" style="margin:20px 0; font-weight:bold; min-height:24px;">Kopf oder
+                                Zahl?</div>
 
-                        <div id="cf-options" style="display:flex; justify-content:center; gap:15px;">
-                            <button class="btn-main" onclick="flipCoin('head')"
-                                style="background:var(--primary); width:100px;">Kopf</button>
-                            <button class="btn-main" onclick="flipCoin('tail')"
-                                style="background:#444; width:100px;">Zahl</button>
-                        </div>
-                        <div id="cf-result-actions" class="hidden"
-                            style="display:flex; justify-content:center; gap:15px;">
-                            <button class="btn-main" onclick="cfContinue()" style="background:var(--accent);">Nochmal
-                                (x2)</button>
-                            <button class="btn-main" onclick="cfCashOut()"
-                                style="background:#4CAF50;">Auszahlen</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SPORTS BETTING GAME -->
-                <div id="sports-betting-view" class="hidden">
-                    <div class="section-header"
-                        style="display:flex; justify-content:space-between; align-items:center;">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <span>Sportwetten</span>
-                            <select id="sports-league-select" onchange="changeLeague(this.value)"
-                                style="background:#333; color:#fff; border:1px solid #555; padding:5px; border-radius:5px; margin-left:10px; font-size: 0.8rem;">
-                                <option value="4331">Bundesliga</option>
-                                <option value="4328">Premier League</option>
-                                <option value="4335">La Liga</option>
-                                <option value="4346">2. Bundesliga</option>
-                                <option value="4429">WM Qualifikation</option>
-                            </select>
-                            <div id="sports-account-info"
-                                style="font-size:0.8rem; color:gold; background:rgba(255, 215, 0, 0.1); padding:4px 8px; border-radius:6px; border:1px solid rgba(255, 215, 0, 0.3);">
+                            <div id="cf-options" style="display:flex; justify-content:center; gap:15px;">
+                                <button class="btn-main" onclick="flipCoin('head')"
+                                    style="background:var(--primary); width:100px;">Kopf</button>
+                                <button class="btn-main" onclick="flipCoin('tail')"
+                                    style="background:#444; width:100px;">Zahl</button>
                             </div>
-                        </div>
-                        <button onclick="exitSportsBetting()"
-                            style="background:none; border:none; color:var(--text-muted); cursor:pointer;">Beenden
-                            <i class="fas fa-times"></i></button>
-                    </div>
-
-                    <div class="sports-container">
-                        <!-- Tabs -->
-                        <div style="display:flex; gap:10px; margin-bottom:15px;">
-                            <button id="btn-sports-upcoming" class="btn-main" style="flex:1; background:var(--primary);"
-                                onclick="showSportsTab('upcoming')">Spiele</button>
-                            <button id="btn-sports-mybets" class="btn-main" style="flex:1; background:#444;"
-                                onclick="showSportsTab('mybets')">Meine Wetten</button>
-                        </div>
-
-                        <!-- Upcoming Matches -->
-                        <div id="sports-upcoming-list">
-                            <div style="text-align:center; padding:20px; color:#aaa;">Lade Spiele...</div>
-                        </div>
-
-                        <!-- My Bets -->
-                        <div id="sports-mybets-list" class="hidden">
-                            <div style="text-align:center; padding:20px; color:#aaa;">Keine aktiven Wetten.
+                            <div id="cf-result-actions" class="hidden"
+                                style="display:flex; justify-content:center; gap:15px;">
+                                <button class="btn-main" onclick="cfContinue()"
+                                    style="background:var(--accent);">Nochmal (x2)</button>
+                                <button class="btn-main" onclick="cfCashOut()"
+                                    style="background:#4CAF50;">Auszahlen</button>
                             </div>
                         </div>
                     </div>
                 </div>
-
-
             </div>
+
+            <!-- SPORTS BETTING GAME -->
+            <div id="sports-betting-view" class="hidden">
+                <div class="section-header" style="display:flex; justify-content:space-between; align-items:center;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span>Sportwetten</span>
+                        <select id="sports-league-select" onchange="changeLeague(this.value)"
+                            style="background:#333; color:#fff; border:1px solid #555; padding:5px; border-radius:5px; margin-left:10px; font-size: 0.8rem;">
+                            <option value="4331">Bundesliga</option>
+                            <option value="4328">Premier League</option>
+                            <option value="4335">La Liga</option>
+                            <option value="4346">2. Bundesliga</option>
+                            <option value="4429">WM Qualifikation</option>
+                        </select>
+                        <div id="sports-account-info"
+                            style="font-size:0.8rem; color:gold; background:rgba(255, 215, 0, 0.1); padding:4px 8px; border-radius:6px; border:1px solid rgba(255, 215, 0, 0.3);">
+                        </div>
+                    </div>
+                    <button onclick="exitSportsBetting()"
+                        style="background:none; border:none; color:var(--text-muted); cursor:pointer;">Beenden
+                        <i class="fas fa-times"></i></button>
+                </div>
+
+                <div class="sports-container">
+                    <!-- Tabs -->
+                    <div style="display:flex; gap:10px; margin-bottom:15px;">
+                        <button id="btn-sports-upcoming" class="btn-main" style="flex:1; background:var(--primary);"
+                            onclick="showSportsTab('upcoming')">Spiele</button>
+                        <button id="btn-sports-mybets" class="btn-main" style="flex:1; background:#444;"
+                            onclick="showSportsTab('mybets')">Meine Wetten</button>
+                    </div>
+
+                    <!-- Upcoming Matches -->
+                    <div id="sports-upcoming-list">
+                        <div style="text-align:center; padding:20px; color:#aaa;">Lade Spiele...</div>
+                    </div>
+
+                    <!-- My Bets -->
+                    <div id="sports-mybets-list" class="hidden">
+                        <div style="text-align:center; padding:20px; color:#aaa;">Keine aktiven Wetten.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NEU: Admin Casino Settings View (Full Page) -->
+            <div id="admin-casino-settings-view" class="hidden" style="padding-bottom:100px;">
+                <div class="section-header" style="display:flex; align-items:center; gap:10px;">
+                    <button onclick="closeCasinoSettingsPage()"
+                        style="background:none; border:none; color:white; font-size:1.2rem; cursor:pointer;"><i
+                            class="fas fa-arrow-left"></i></button>
+                    <span>Casino Einstellungen</span>
+                </div>
+
+                <div class="settings-card">
+                    <h4 style="margin-top:0;">Allgemein</h4>
+                    <label style="display:block; text-align:left; margin-bottom:5px; color:#aaa;">Wechselkurs (1 Lob = X
+                        Chips)</label>
+                    <input id="page-casino-rate" type="number" style="margin-bottom:15px;" placeholder="10">
+
+                    <label style="display:block; text-align:left; margin-bottom:5px; color:#aaa;">Blackjack Einsatz
+                        (Chips)</label>
+                    <input id="page-casino-bj-cost" type="number" style="margin-bottom:15px;" placeholder="1">
+
+                    <label style="display:block; text-align:left; margin-bottom:5px; color:#aaa;">Standard
+                        Zeitzone</label>
+                    <select id="page-casino-timezone"
+                        style="width:100%; background:#333; color:white; border:1px solid #555; padding:8px; border-radius:5px;">
+                        <option value="Europe/London">Europe/London (GMT)</option>
+                        <option value="Europe/Berlin">Europe/Berlin (CET)</option>
+                        <option value="Europe/Paris">Europe/Paris (CET)</option>
+                        <option value="Europe/Rome">Europe/Rome (CET)</option>
+                        <option value="Europe/Madrid">Europe/Madrid (CET)</option>
+                        <option value="Europe/Vienna">Europe/Vienna (CET)</option>
+                        <option value="Europe/Warsaw">Europe/Warsaw (CET)</option>
+                        <option value="Europe/Athens">Europe/Athens (EET)</option>
+                        <option value="Europe/Moscow">Europe/Moscow (MSK)</option>
+                        <option value="Europe/Istanbul">Europe/Istanbul (TRT)</option>
+                        <option value="America/New_York">America/New_York (EST)</option>
+                        <option value="America/Chicago">America/Chicago (CST)</option>
+                        <option value="America/Denver">America/Denver (MST)</option>
+                        <option value="America/Los_Angeles">America/Los_Angeles (PST)</option>
+                        <option value="America/Toronto">America/Toronto (EST)</option>
+                        <option value="America/Mexico_City">America/Mexico_City (CST)</option>
+                        <option value="America/Sao_Paulo">America/Sao_Paulo (BRT)</option>
+                        <option value="America/Argentina/Buenos_Aires">America/Buenos_Aires (ART)</option>
+                        <option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
+                        <option value="Asia/Shanghai">Asia/Shanghai (CST)</option>
+                        <option value="Asia/Hong_Kong">Asia/Hong_Kong (HKT)</option>
+                        <option value="Asia/Singapore">Asia/Singapore (SGT)</option>
+                        <option value="Asia/Bangkok">Asia/Bangkok (ICT)</option>
+                        <option value="Asia/Dubai">Asia/Dubai (GST)</option>
+                        <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
+                        <option value="Asia/Seoul">Asia/Seoul (KST)</option>
+                        <option value="Australia/Sydney">Australia/Sydney (AEDT)</option>
+                        <option value="Australia/Melbourne">Australia/Melbourne (AEDT)</option>
+                        <option value="Australia/Perth">Australia/Perth (AWST)</option>
+                        <option value="Pacific/Auckland">Pacific/Auckland (NZDT)</option>
+                        <option value="Africa/Cairo">Africa/Cairo (EET)</option>
+                        <option value="Africa/Johannesburg">Africa/Johannesburg (SAST)</option>
+                        <option value="UTC">UTC</option>
+                    </select>
+                </div>
+
+                <div class="settings-card">
+                    <h4 style="margin-top:0;">Slots Konfiguration</h4>
+                    <p style="font-size:0.8rem; color:#aaa; margin-bottom:10px;">Gib hier Emojis oder Bild-URLs ein
+                        (Komma-getrennt).</p>
+                    <textarea id="page-casino-slots"
+                        style="width:100%; height:100px; background:#111; color:white; border:1px solid #333; border-radius:8px; padding:10px;"></textarea>
+                </div>
+
+                <button class="btn-main" onclick="saveCasinoSettingsPage()"
+                    style="background:var(--primary); position:fixed; bottom:20px; left:20px; width:calc(100% - 40px); z-index:100;">
+                    <i class="fas fa-save"></i> Speichern
+                </button>
+            </div>
+
+    </div>
     </div>
 
 
@@ -2221,51 +2303,80 @@
 
         // --- NAVIGATION ---
         function nav(tab) {
-            // Alle Tabs ausblenden
-            ['home', 'activity', 'leaderboard', 'shop', 'profile', 'admin', 'user-admin', 'badge-admin', 'log-admin', 'casino', 'shop-admin'].forEach(t => {
-                const el = document.getElementById('tab-' + t);
-                if (el) el.classList.add('hidden');
+            // Smooth Transition: Fade out current
+            const activeTabs = document.querySelectorAll('.fade-in:not(.hidden)');
+            activeTabs.forEach(t => {
+                t.style.opacity = '0';
+                t.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    t.classList.add('hidden');
+                    t.style.opacity = '';
+                    t.style.transform = '';
+                }, 200);
             });
 
-            // Alle Nav-Items deaktivieren
-            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            // Wait for fade out (short delay) or immediate if first load
+            setTimeout(() => {
+                // Alle Tabs ausblenden (Safety)
+                ['home', 'activity', 'leaderboard', 'shop', 'profile', 'admin', 'user-admin', 'badge-admin', 'log-admin', 'casino', 'shop-admin'].forEach(t => {
+                    const el = document.getElementById('tab-' + t);
+                    if (el) el.classList.add('hidden');
+                });
 
-            // Special handling for shop-admin nav button
-            let activeButton;
-            if (tab === 'shop-admin') {
-                activeButton = document.getElementById('nav-shop-admin');
-                document.getElementById('tab-shop-admin').classList.remove('hidden');
-            } else {
-                activeButton = document.querySelector(`.nav-bar button[onclick="nav('${tab}')"]`);
-                const tabEl = document.getElementById('tab-' + tab);
-                if (tabEl) tabEl.classList.remove('hidden');
-            }
+                // Alle Nav-Items deaktivieren
+                document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
 
-            if (activeButton) activeButton.classList.add('active');
+                // Explicitly hide Sports Betting View if open
+                const sportsView = document.getElementById('sports-betting-view');
+                if (sportsView && !sportsView.classList.contains('hidden')) {
+                    sportsView.classList.add('hidden');
+                }
 
-            if (currentUser !== 'Admin') {
-                let total = 0;
-                if (currentUser) {
-                    try {
-                        total = calculateTotalScore(currentUser);
-                    } catch (e) {
-                        console.error("Error calculating score:", e);
+                // Special handling for shop-admin nav button
+                let activeButton;
+                if (tab === 'shop-admin') {
+                    activeButton = document.getElementById('nav-shop-admin');
+                    const target = document.getElementById('tab-shop-admin');
+                    target.classList.remove('hidden');
+                    // Trigger reflow
+                    void target.offsetWidth;
+                    target.classList.add('visible'); // Add visible class for CSS transition if needed
+                } else {
+                    activeButton = document.querySelector(`.nav-bar button[onclick="nav('${tab}')"]`);
+                    const tabEl = document.getElementById('tab-' + tab);
+                    if (tabEl) {
+                        tabEl.classList.remove('hidden');
+                        // Trigger reflow
+                        void tabEl.offsetWidth;
+                        tabEl.classList.add('visible');
                     }
                 }
 
-                if (tab === 'activity') {
-                    unreadLobs = 0;
-                    updateActivityBadge();
-                }
-                if (tab === 'home') renderDashboard(total);
-                if (tab === 'activity') renderActivity();
-                if (tab === 'shop') renderShop();
-                if (tab === 'profile') renderProfile(total);
-                if (tab === 'casino') renderCasino();
+                if (activeButton) activeButton.classList.add('active');
 
-                // Fallback für Admin-Tab wenn nicht eingeloggt
-                if (tab === 'admin') {
-                    document.getElementById('tab-admin').innerHTML = `
+                if (currentUser !== 'Admin') {
+                    let total = 0;
+                    if (currentUser) {
+                        try {
+                            total = calculateTotalScore(currentUser);
+                        } catch (e) {
+                            console.error("Error calculating score:", e);
+                        }
+                    }
+
+                    if (tab === 'activity') {
+                        unreadLobs = 0;
+                        updateActivityBadge();
+                    }
+                    if (tab === 'home') renderDashboard(total);
+                    if (tab === 'activity') renderActivity();
+                    if (tab === 'shop') renderShop();
+                    if (tab === 'profile') renderProfile(total);
+                    if (tab === 'casino') renderCasino();
+
+                    // Fallback für Admin-Tab wenn nicht eingeloggt
+                    if (tab === 'admin') {
+                        document.getElementById('tab-admin').innerHTML = `
                         <div class="section-header">Admin Bereich</div>
                         <div class="settings-card" style="text-align:center; padding: 40px 20px;">
                             <i class="fas fa-lock" style="font-size: 3rem; color: #666; margin-bottom: 20px;"></i>
@@ -2273,17 +2384,18 @@
                             <p style="font-size: 0.8rem; color: #888;">(Fingerabdruck-Icon auf dem Login-Screen)</p>
                         </div>
                     `;
+                    }
+                } else {
+                    // Admin spezifische Navigations-Routinen
+                    if (tab === 'shop-admin') renderAdminRewardList();
+                    if (tab === 'user-admin') renderUserAdmin();
+                    if (tab === 'badge-admin') renderBadgeAdmin();
+                    if (tab === 'log-admin') renderLogList();
+                    if (tab === 'admin') renderAdmin();
                 }
-            } else {
-                // Admin spezifische Navigations-Routinen
-                if (tab === 'shop-admin') renderAdminRewardList();
-                if (tab === 'user-admin') renderUserAdmin();
-                if (tab === 'badge-admin') renderBadgeAdmin();
-                if (tab === 'log-admin') renderLogList();
-                if (tab === 'admin') renderAdmin();
-            }
 
-            if (tab === 'leaderboard') renderLeaderboard();
+                if (tab === 'leaderboard') renderLeaderboard();
+            }, 50); // Short delay for transition
         }
 
         // NEU: Test Modus
@@ -2378,28 +2490,34 @@
                 options[i] = `${i} Lob${i > 1 ? 's' : ''}`;
             }
 
-            const { value: count } = await Swal.fire({
+            const { value: formValues } = await Swal.fire({
                 title: `Lob für ${targetUser}`,
                 html: `
                 <p>Wähle die Anzahl der Lobs, die du geben möchtest:</p>
                 <select id="swal-select-count" class="swal2-input">
                     ${Object.entries(options).map(([val, text]) => `<option value="${val}">${text}</option>`).join('')}
                 </select>
+                <input id="swal-reason" class="swal2-input" placeholder="Grund (optional)">
             `,
                 focusConfirm: false,
                 showCancelButton: true,
                 confirmButtonText: 'Lob senden',
                 confirmButtonColor: 'var(--primary)',
                 background: '#1a1a1a', color: '#fff',
-                preConfirm: () => document.getElementById('swal-select-count').value
+                preConfirm: () => {
+                    return [
+                        document.getElementById('swal-select-count').value,
+                        document.getElementById('swal-reason').value
+                    ]
+                }
             });
 
-            if (count) {
-                sendLob(targetUser, parseInt(count));
+            if (formValues) {
+                sendLob(targetUser, parseInt(formValues[0]), formValues[1]);
             }
         }
 
-        async function sendLob(targetUser, count) {
+        async function sendLob(targetUser, count, reason = '') {
             if (count <= 0 || !db.users[targetUser] || !db.users[targetUser].received) return;
 
             // Speichere die Aktion für Undo
@@ -2411,13 +2529,15 @@
                 db.users[targetUser].received[senderKey] = (db.users[targetUser].received[senderKey] || 0) + count;
             }
 
+            const reasonText = reason ? ` Grund: ${reason}` : '';
             db.logs.unshift({
                 id: logId,
                 time: new Date().toLocaleString(),
-                msg: `${currentUser} lobt ${targetUser} mit ${count} Punkten. (LOB)`,
+                msg: `${currentUser} lobt ${targetUser} mit ${count} Punkten. (LOB)${reasonText}`,
                 sender: currentUser,
                 receiver: targetUser,
-                amount: count
+                amount: count,
+                reason: reason
             });
 
             // Speichere für Undo
@@ -2569,7 +2689,10 @@
                             <span style="${style}">${icon} ${isSent ? 'GESENDET' : 'ERHALTEN'}</span>
                             <span style="font-size: 0.8rem; color: var(--text-muted); margin-left: 10px;">${log.time.split(',')[0]}</span>
                         </div>
-                        <div style="font-size: 0.9rem;">${actionText}: ${log.msg.includes('(REWARD)') ? log.msg.split('gelöst')[0] + ' eingelöst' : log.msg.split('lobt')[0] + ' Lob gegeben'}</div>
+                        <div style="font-size: 0.9rem;">
+                            ${actionText}: ${log.msg.includes('(REWARD)') ? log.msg.split('gelöst')[0] + ' eingelöst' : log.msg.split('lobt')[0] + ' Lob gegeben'}
+                            ${log.reason ? `<br><span style="font-size:0.8rem; color:#aaa; font-style:italic;">"${log.reason}"</span>` : ''}
+                        </div>
                     </div>
                     <div style="font-size: 1.2rem; font-weight: 700; ${style}">${amount}</div>
                 </div>
@@ -2634,14 +2757,34 @@
         async function setGoalReward(rewardId) {
             if (currentUser === 'Admin') return;
 
+            // If no shop account is selected, check if we can auto-select
+            if (!selectedShopAccount) {
+                const relevantScores = getRelevantScores(currentUser);
+                const filteredScores = relevantScores.filter(s => s.name !== 'Admin');
+
+                if (filteredScores.length === 0) {
+                    Swal.fire('Info', 'Keine Konten verfügbar.', 'info');
+                    return;
+                }
+
+                // If only one account, auto-select it
+                if (filteredScores.length === 1) {
+                    selectedShopAccount = filteredScores[0].name;
+                } else {
+                    Swal.fire('Info', 'Bitte wähle zuerst oben ein Konto aus.', 'info');
+                    return;
+                }
+            }
+
             db.users[currentUser].goalRewardId = rewardId;
+            db.users[currentUser].goalRewardSource = selectedShopAccount; // Store source
             await save();
 
             const reward = db.rewards.find(r => r.id === rewardId);
             Swal.fire({
                 icon: 'success',
                 title: 'Ziel gesetzt!',
-                text: `"${reward.name}" ist jetzt dein Sparziel.`,
+                text: `"${reward.name}" ist jetzt dein Sparziel auf Konto ${selectedShopAccount}.`,
                 background: '#1a1a1a',
                 color: '#fff',
                 confirmButtonColor: '#ff4d6d'
@@ -2667,33 +2810,36 @@
             });
 
             if (isConfirmed) {
-                db.users[currentUser].goalRewardId = null;
-                await save();
-                nav('home');
+                if (isConfirmed) {
+                    db.users[currentUser].goalRewardId = null;
+                    db.users[currentUser].goalRewardSource = null;
+                    await save();
+                    nav('home');
+                }
             }
         }
 
-        // KORRIGIERTE renderShop() - IMMER ALLE KONTEN ANZEIGEN (ausgegraut wenn nicht genug)
+        // KORRIGIERTE renderShop() - MIT ACCOUNT SELECTION
         function renderShop() {
-
-            // 1. KONTOSTÄNDE ANZEIGEN
-            const relevantScores = getRelevantScores(currentUser);
             const shopScoresDiv = document.getElementById('shop-separate-scores');
             shopScoresDiv.innerHTML = '';
 
-            // NEU: Filtere Admin-Konto aus (Admin soll nicht im Shop angezeigt werden)
+            // 1. KONTO-AUSWAHL (Toggle)
+            const relevantScores = getRelevantScores(currentUser);
+            // Filtere Admin-Konto aus
             const filteredScores = relevantScores.filter(s => s.name !== 'Admin');
 
-            // Ermittle den HÖCHSTEN Score
-            let maxRelevantScore = 0;
-            if (filteredScores.length > 0) {
-                maxRelevantScore = Math.max(...filteredScores.map(s => s.score));
+            if (filteredScores.length === 0) {
+                shopScoresDiv.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 10px;">Keine Shop-Konten vorhanden.</div>`;
+                return;
             }
 
-            if (filteredScores.length > 0) {
-                filteredScores.forEach(s => {
-                    shopScoresDiv.innerHTML += `
-                    <div class="score-display-small ${s.cssClass}">
+            filteredScores.forEach(s => {
+                const isSelected = selectedShopAccount === s.name;
+                shopScoresDiv.innerHTML += `
+                    <div class="score-display-small ${s.cssClass}" 
+                         style="cursor:pointer; border: 2px solid ${isSelected ? 'var(--accent)' : 'transparent'}; opacity: ${selectedShopAccount && !isSelected ? '0.5' : '1'}; transform: ${isSelected ? 'scale(1.05)' : 'scale(1)'}; transition: all 0.2s;"
+                         onclick="selectShopAccountToggle('${s.name}')">
                         <div>
                             <i class="fas fa-user" style="color: ${s.cssClass === 'thomas' ? '#00bcd4' : (s.cssClass === 'emil' ? '#ff9900' : 'gold')};"></i>
                             Konto ${s.name}
@@ -2701,38 +2847,51 @@
                         <div>${s.score}</div>
                     </div>
                 `;
-                });
-            } else {
-                shopScoresDiv.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 10px;">Keine Shop-Konten vorhanden.</div>`;
-            }
+            });
 
-            // 2. PRÄMIEN IM RASTER ANZEIGEN
+            // 2. PRÄMIEN ANZEIGEN (Nur wenn Konto ausgewählt)
             const shopDiv = document.getElementById('shop-reward-list');
             shopDiv.innerHTML = '';
 
+            if (!selectedShopAccount) {
+                shopDiv.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">
+                        <i class="fas fa-arrow-up" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>Bitte wähle oben ein Konto aus, um einzukaufen oder Ziele zu setzen.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Hole Score des ausgewählten Kontos
+            const selectedAccountData = filteredScores.find(s => s.name === selectedShopAccount);
+            const currentScore = selectedAccountData ? selectedAccountData.score : 0;
+
             db.rewards.forEach(r => {
-                // Prüfung, ob es SICH JEMAND leisten kann (mit dem besten Einzelkonto)
-                const canAfford = maxRelevantScore >= r.cost;
+                const canAfford = currentScore >= r.cost;
                 const icon = REWARD_ICONS[r.name] || REWARD_ICONS['default'];
 
                 let missingText = '';
                 if (!canAfford) {
-                    const missingAmount = r.cost - maxRelevantScore;
-                    // Zeige den Fehlbetrag an, basierend auf dem besten verfügbaren Konto-Score
+                    const missingAmount = r.cost - currentScore;
                     missingText = `<div class="shop-missing-info">(fehlen ${missingAmount} Lobs)</div>`;
                 }
 
-                // NEU: Ziel-Button (nur für normale User, nicht Admin)
-                const isCurrentGoal = (currentUser !== 'Admin' && db.users[currentUser].goalRewardId === r.id);
+                // NEU: Ziel-Button
+                // Check if this reward is the current goal for the SELECTED account
+                // Note: We need to store goal source too.
+                const userData = db.users[currentUser];
+                const isCurrentGoal = (currentUser !== 'Admin' && userData.goalRewardId === r.id && userData.goalRewardSource === selectedShopAccount);
+
                 const goalButton = currentUser !== 'Admin' ? `
                     <button class="btn-main" onclick="event.stopPropagation(); ${isCurrentGoal ? 'removeGoalReward()' : `setGoalReward(${r.id})`}" 
                         style="background: ${isCurrentGoal ? 'var(--accent)' : '#444'}; font-size: 0.8rem; padding: 8px; margin-top: 8px; width: 100%;">
-                        <i class="fas ${isCurrentGoal ? 'fa-check' : 'fa-bullseye'}"></i> ${isCurrentGoal ? 'Aktuelles Ziel' : 'Als Ziel'}
+                        <i class="fas ${isCurrentGoal ? 'fa-check' : 'fa-bullseye'}"></i> ${isCurrentGoal ? 'Aktuelles Ziel' : 'Als Ziel setzen'}
                     </button>
                 ` : '';
 
                 shopDiv.innerHTML += `
-                <div class="shop-item-card ${canAfford ? '' : 'disabled'}" onclick="openShopItem(${r.id})">
+                <div class="shop-item-card ${canAfford ? '' : 'disabled'}" onclick="${canAfford ? `openShopItem(${r.id})` : ''}" style="${!canAfford ? 'cursor:not-allowed; opacity:0.7;' : ''}">
                     <div class="shop-icon">${icon}</div>
                     <div style="font-weight:700;">${r.name}</div>
                     <div class="shop-cost">${r.cost} Lobs</div>
@@ -2743,97 +2902,37 @@
             });
         }
 
-        // NEUE, KORRIGIERTE openShopItem(id) - IMMER ALLE KONTEN ANZEIGEN (ausgegraut wenn nicht genug)
-        async function openShopItem(id) {
-            const reward = db.rewards.find(r => r.id === id);
-            const relevantScores = getRelevantScores(currentUser);
-
-            // NEU: Filtere Admin-Konto aus
-            const filteredScores = relevantScores.filter(s => s.name !== 'Admin');
-
-            let selectionHtml = '';
-
-            // Erstelle das Layout mit Profilbildern - ALLE Konten anzeigen
-            selectionHtml += '<div id="account-selection-container" style="display: flex; justify-content: space-around; gap: 10px; margin-bottom: 20px;">';
-
-            filteredScores.forEach(s => {
-                const canAfford = s.score >= reward.cost;
-                const imageUrl = db.users[s.name].image;
-                const missingAmount = canAfford ? 0 : (reward.cost - s.score);
-
-                selectionHtml += `
-                <div 
-                    class="account-option ${canAfford ? '' : 'disabled'}" 
-                    data-account-name="${s.name}" 
-                    data-score="${s.score}"
-                    data-can-afford="${canAfford}"
-                    onclick="${canAfford ? `selectShopAccount(${reward.id}, '${s.name}', ${reward.cost})` : ''}"
-                    style="
-                        cursor: ${canAfford ? 'pointer' : 'not-allowed'}; 
-                        padding: 10px; 
-                        border: 2px solid transparent;
-                        border-radius: 8px; 
-                        transition: all 0.2s;
-                        flex-basis: 48%;
-                        background-color: ${canAfford ? '#333' : '#1a1a1a'};
-                        opacity: ${canAfford ? '1' : '0.5'};
-                    ">
-                    <img src="${imageUrl}" style="width: 50px; height: 50px; border-radius: 50%; display: block; margin: 0 auto 5px auto; ${canAfford ? '' : 'filter: grayscale(100%);'}">
-                    <div style="font-weight: bold; color: ${canAfford ? '#fff' : '#666'};">${s.name}</div>
-                    <div style="font-size: 0.9rem; color: ${canAfford ? 'gold' : '#888'};">${s.score} Lobs</div>
-                    ${!canAfford ? `<div style="font-size: 0.8rem; color: var(--danger); margin-top: 5px;">(fehlen ${missingAmount})</div>` : ''}
-                </div>
-            `;
-            });
-            selectionHtml += '</div>';
-
-            // Füge Platzhalter für den dynamischen Kauf-Button hinzu
-            selectionHtml += '<div id="buy-button-placeholder" style="min-height: 40px;"></div>';
-
-            // Zeige das Pop-up an
-            await Swal.fire({
-                title: reward.name,
-                html: `
-                <p style="font-size:0.9rem; color:#ccc;">${reward.desc || 'Keine Beschreibung vorhanden.'}</p>
-                <div style="font-weight:700; color:gold; margin-bottom:20px;">Kosten: ${reward.cost} Lobs</div>
-                
-                ${selectionHtml}
-                
-                <button class="btn-main" style="background: #444;" onclick="Swal.close()">Abbrechen</button>
-            `,
-                focusConfirm: false,
-                showConfirmButton: false,
-                background: '#1a1a1a', color: '#fff',
-            });
+        function selectShopAccountToggle(name) {
+            if (selectedShopAccount === name) {
+                selectedShopAccount = null; // Deselect
+            } else {
+                selectedShopAccount = name;
+            }
+            renderShop();
         }
 
-        // NEUE Funktion: selectShopAccount(accountName, cost)
-        // Wird aufgerufen, wenn ein Profilbild im Shop-Pop-up angeklickt wird
-        function selectShopAccount(rewardId, accountName, cost) {
-            const placeholder = document.getElementById('buy-button-placeholder');
-            const allOptions = document.querySelectorAll('.account-option');
-            const accountNameDisplay = `Konto ${accountName}`;
-
-            // 1. Visuelles Feedback: Setze Rahmen auf allen Optionen zurück
-            allOptions.forEach(opt => {
-                opt.style.border = '2px solid transparent';
-            });
-
-            // 2. Visuelles Feedback: Markiere die aktuelle Auswahl
-            const selectedOption = document.querySelector(`.account-option[data-account-name="${accountName}"]`);
-            if (selectedOption) {
-                selectedOption.style.border = '2px solid var(--accent)';
+        // NEUE openShopItem(id) - Nutzt selectedShopAccount
+        async function openShopItem(id) {
+            if (!selectedShopAccount) {
+                Swal.fire('Info', 'Bitte wähle zuerst ein Konto aus.', 'info');
+                return;
             }
 
-            // 3. Render den Kauf-Button neu
-            placeholder.innerHTML = `
-            <button 
-                class="btn-main" 
-                style="background: var(--primary); width: 100%; margin-bottom: 15px;"
-                onclick="redeemReward(${rewardId}, '${accountName}'); Swal.close();">
-                JETZT KAUFEN (${cost} Lobs) mit ${accountNameDisplay}
-            </button>
-        `;
+            const reward = db.rewards.find(r => r.id === id);
+
+            const { isConfirmed } = await Swal.fire({
+                title: 'Prämie kaufen?',
+                text: `Möchtest du "${reward.name}" für ${reward.cost} Lobs kaufen? (Konto: ${selectedShopAccount})`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ja, kaufen',
+                background: '#1a1a1a', color: '#fff',
+                confirmButtonColor: 'var(--primary)'
+            });
+
+            if (isConfirmed) {
+                redeemReward(id, selectedShopAccount);
+            }
         }
 
         async function redeemReward(id, scoreSource) {
@@ -2866,54 +2965,59 @@
         let bjPlayerHand = [];
         let bjGameOver = true;
         let currentBetSource = null;
+        let selectedShopAccount = null; // NEU: Für Shop-Auswahl
 
         // Coin Flip State
         let cfStake = 0;
         let cfActive = false;
 
-        async function openCasinoSettings() {
+        // NEU: Full Page Casino Settings Logic
+        function openCasinoSettingsPage() {
             if (!db.appSettings) db.appSettings = {};
             if (!db.appSettings.casino) db.appSettings.casino = { exchangeRate: 10, blackjackCost: 1 };
-            if (!db.appSettings.slots) db.appSettings.slots = ['🍒', '🍋', '🍉', '⭐', '💎', '7️⃣'];
+            if (!db.appSettings.slots) db.appSettings.slots = [];
+            if (!db.appSettings.timezone) db.appSettings.timezone = 'Europe/Berlin'; // Default
 
-            const currentSlots = db.appSettings.slots.join(',');
+            document.getElementById('page-casino-rate').value = db.appSettings.casino.exchangeRate;
+            document.getElementById('page-casino-bj-cost').value = db.appSettings.casino.blackjackCost;
+            document.getElementById('page-casino-slots').value = db.appSettings.slots.join(',');
+            document.getElementById('page-casino-timezone').value = db.appSettings.timezone;
 
-            const { value: formValues } = await Swal.fire({
-                title: 'Casino Einstellungen',
-                html: `
-                    <label style="display:block; text-align:left; margin-bottom:5px;">Wechselkurs (1 Lob = X Chips)</label>
-                    <input id="swal-casino-rate" type="number" class="swal2-input" value="${db.appSettings.casino.exchangeRate}" style="margin-bottom:15px; background:#333; color:white; border:1px solid #555;">
-                    
-                    <label style="display:block; text-align:left; margin-bottom:5px;">Blackjack Einsatz (Chips)</label>
-                    <input id="swal-casino-bj-cost" type="number" class="swal2-input" value="${db.appSettings.casino.blackjackCost}" style="margin-bottom:15px; background:#333; color:white; border:1px solid #555;">
-                
-                    <label style="display:block; text-align:left; margin-bottom:5px;">Slots Symbole (Komma-getrennt, Emojis oder Bild-URLs)</label>
-                    <textarea id="swal-casino-slots" class="swal2-textarea" style="background:#333; color:white; border:1px solid #555;">${currentSlots}</textarea>
-                `,
-                focusConfirm: false,
-                background: '#1a1a1a', color: '#fff',
-                preConfirm: () => {
-                    return [
-                        document.getElementById('swal-casino-rate').value,
-                        document.getElementById('swal-casino-bj-cost').value,
-                        document.getElementById('swal-casino-slots').value
-                    ]
-                }
-            });
+            nav('admin'); // Ensure we are in admin context visually if needed, but we are overlaying
+            document.getElementById('admin-casino-settings-view').classList.remove('hidden');
+            document.getElementById('tab-admin').classList.add('hidden'); // Hide main admin tab
+        }
 
-            if (formValues) {
-                db.appSettings.casino.exchangeRate = parseInt(formValues[0]);
-                db.appSettings.casino.blackjackCost = parseInt(formValues[1]);
+        function closeCasinoSettingsPage() {
+            document.getElementById('admin-casino-settings-view').classList.add('hidden');
+            document.getElementById('tab-admin').classList.remove('hidden');
+        }
 
-                // Parse Slots
-                const slotsInput = formValues[2];
-                if (slotsInput && slotsInput.trim() !== '') {
-                    db.appSettings.slots = slotsInput.split(',').map(s => s.trim()).filter(s => s !== '');
-                }
+        async function saveCasinoSettingsPage() {
+            const rate = parseInt(document.getElementById('page-casino-rate').value);
+            const bjCost = parseInt(document.getElementById('page-casino-bj-cost').value);
+            const slotsStr = document.getElementById('page-casino-slots').value;
+            const timezone = document.getElementById('page-casino-timezone').value;
 
-                await save();
-                Swal.fire('Gespeichert', 'Casino Einstellungen aktualisiert.', 'success');
+            if (isNaN(rate) || isNaN(bjCost)) {
+                Swal.fire('Fehler', 'Bitte gültige Zahlen eingeben.', 'error');
+                return;
             }
+
+            db.appSettings.casino.exchangeRate = rate;
+            db.appSettings.casino.blackjackCost = bjCost;
+            db.appSettings.slots = slotsStr.split(',').map(s => s.trim()).filter(s => s);
+            db.appSettings.timezone = timezone;
+
+            await save();
+            Swal.fire({
+                icon: 'success',
+                title: 'Gespeichert',
+                text: 'Einstellungen wurden übernommen.',
+                background: '#1a1a1a', color: '#fff',
+                timer: 1500, showConfirmButton: false
+            });
+            closeCasinoSettingsPage();
         }
 
         // Slots State
@@ -2931,10 +3035,13 @@
             document.getElementById('casino-account-selection').classList.remove('hidden');
             document.getElementById('casino-main-menu').classList.add('hidden');
             document.getElementById('casino-exchange-menu').classList.add('hidden');
-            document.getElementById('blackjack-game').classList.add('hidden');
-            document.getElementById('roulette-game').classList.add('hidden');
-            document.getElementById('slots-game').classList.add('hidden');
-            document.getElementById('coinflip-game').classList.add('hidden');
+
+            // Hide all game views with correct IDs
+            const gameViews = ['blackjack-view', 'roulette-view', 'slots-view', 'coin-flip-view', 'sports-betting-view'];
+            gameViews.forEach(viewId => {
+                const view = document.getElementById(viewId);
+                if (view) view.classList.add('hidden');
+            });
 
             const grid = document.getElementById('casino-accounts-list');
             grid.innerHTML = '';
@@ -2942,7 +3049,7 @@
             const received = db.users[currentUser].received;
 
             // 1. Alle anderen User (immer anzeigen)
-            const otherUsers = Object.keys(db.users).filter(u => u !== 'Admin' && u !== currentUser);
+            const otherUsers = Object.keys(db.users).filter(u => u !== 'Admin' && u !== 'TestUser' && u !== currentUser);
 
             // 2. Admin/Casino (nur wenn > 0)
             const specialSources = ['Admin', 'Casino'].filter(s => received[s] > 0);
@@ -2967,6 +3074,16 @@
 
         function selectCasinoAccount(source) {
             currentBetSource = source;
+
+            // Hide all game views
+            const gameViews = ['blackjack-view', 'roulette-view', 'slots-view', 'coin-flip-view', 'sports-betting-view'];
+            gameViews.forEach(viewId => {
+                const view = document.getElementById(viewId);
+                if (view && !view.classList.contains('hidden')) {
+                    view.classList.add('hidden');
+                }
+            });
+
             document.getElementById('casino-account-selection').classList.add('hidden');
             document.getElementById('casino-main-menu').classList.remove('hidden');
             renderCasinoMainMenu();
@@ -2974,6 +3091,16 @@
 
         function backToAccountSelection() {
             currentBetSource = null;
+
+            // Hide all game views
+            const gameViews = ['blackjack-view', 'roulette-view', 'slots-view', 'coin-flip-view', 'sports-betting-view'];
+            gameViews.forEach(viewId => {
+                const view = document.getElementById(viewId);
+                if (view && !view.classList.contains('hidden')) {
+                    view.classList.add('hidden');
+                }
+            });
+
             renderCasino();
         }
 
@@ -3000,6 +3127,17 @@
 
             // Update Game Costs
             if (document.getElementById('menu-bj-cost')) document.getElementById('menu-bj-cost').innerText = `Einsatz: ${settings.blackjackCost} Chip(s)`;
+
+            // Sports Betting Visibility (TestUser only)
+            const sportsBettingCard = document.getElementById('sports-betting-card');
+            const sportsBettingComingSoon = document.getElementById('sports-betting-coming-soon');
+            if (currentUser === 'TestUser') {
+                if (sportsBettingCard) sportsBettingCard.style.display = 'flex';
+                if (sportsBettingComingSoon) sportsBettingComingSoon.style.display = 'none';
+            } else {
+                if (sportsBettingCard) sportsBettingCard.style.display = 'none';
+                if (sportsBettingComingSoon) sportsBettingComingSoon.style.display = 'flex';
+            }
         }
 
         function openExchangeMenu() {
@@ -3563,17 +3701,24 @@
             let winDetails = [];
 
             // Define Lines (coordinates [row, col])
+            // Define Lines (coordinates [row, col])
+            // Added more lines for better win rate
             const paylines = {
                 1: [[1, 0], [1, 1], [1, 2], [1, 3], [1, 4]], // Middle
                 2: [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4]], // Top
                 3: [[2, 0], [2, 1], [2, 2], [2, 3], [2, 4]], // Bottom
                 4: [[0, 0], [1, 1], [2, 2], [1, 3], [0, 4]], // V-Shape (Diagonal down-up)
-                5: [[2, 0], [1, 1], [0, 2], [1, 3], [2, 4]]  // ^-Shape (Diagonal up-down)
+                5: [[2, 0], [1, 1], [0, 2], [1, 3], [2, 4]], // ^-Shape (Diagonal up-down)
+                6: [[0, 0], [1, 1], [0, 2], [1, 3], [0, 4]], // W-Shape
+                7: [[2, 0], [1, 1], [2, 2], [1, 3], [2, 4]], // M-Shape
+                8: [[0, 0], [1, 0], [2, 0], [1, 1], [0, 2]]  // ZigZag start (just example, keeping it simple to 8 lines)
             };
 
             // Check active lines
             // Logic: 3+ consecutive symbols from left
-            for (let l = 1; l <= lines; l++) {
+            // REBALANCED: Higher Multipliers
+            for (let l = 1; l <= 8; l++) { // Check up to 8 lines (or however many defined)
+                if (!paylines[l]) continue;
                 const coords = paylines[l];
                 const lineSymbols = coords.map(c => matrix[c[0]][c[1]]);
 
@@ -3587,9 +3732,9 @@
                 if (count >= 3) {
                     // Win!
                     let multiplier = 0;
-                    if (count === 3) multiplier = 5;
-                    if (count === 4) multiplier = 20;
-                    if (count === 5) multiplier = 100;
+                    if (count === 3) multiplier = 10; // Was 5
+                    if (count === 4) multiplier = 50; // Was 20
+                    if (count === 5) multiplier = 200; // Was 100
 
                     const win = betPerLine * multiplier;
                     totalWin += win;
@@ -3865,13 +4010,22 @@
                 { time: '20:30:00', day: 5 }   // Friday evening
             ];
 
-            // Generate 8 matches over the next 7 days
+            // Generate matches for Today, Tomorrow, and Day After Tomorrow
             const today = new Date();
-            const matchesToGenerate = Math.min(8, Math.floor(teams.length / 2));
+            const matchesToGenerate = 12; // Generate enough matches to fill the days
+
+            // FIXED: Seeded Random Function (deterministic per day and iteration)
+            const dateString = today.toISOString().split('T')[0]; // YYYY-MM-DD
+            const baseSeed = parseInt(dateString.replace(/-/g, '')); // YYYYMMDD as number
+
+            const seededRandom = (seed) => {
+                const x = Math.sin(seed) * 10000;
+                return x - Math.floor(x);
+            };
 
             for (let i = 0; i < matchesToGenerate; i++) {
-                // Calculate date
-                const daysToAdd = i < 4 ? i : i - 3; // First 4 matches in next 4 days, then repeat
+                // Calculate date: 0=Today, 1=Tomorrow, 2=DayAfter
+                const daysToAdd = i % 3;
                 const matchDate = new Date(today);
                 matchDate.setDate(today.getDate() + daysToAdd);
 
@@ -3880,19 +4034,41 @@
                 const timeOptions = matchTimes.filter(t =>
                     t.day === dayOfWeek || (dayOfWeek >= 1 && dayOfWeek <= 5 && t.day >= 1 && t.day <= 5)
                 );
+
+                // Use FIXED seed based on date and iteration
+                const timeSeed = baseSeed + i * 17;
                 const selectedTime = timeOptions.length > 0
-                    ? timeOptions[Math.floor(Math.random() * timeOptions.length)].time
+                    ? timeOptions[Math.floor(seededRandom(timeSeed) * timeOptions.length)].time
                     : '20:00:00';
 
+                // Deterministic team selection - different seeds for home and away
+                const homeSeed = baseSeed + i * 23;
+                const awaySeed = baseSeed + i * 29 + 7; // Offset to avoid same team
+
+                const homeIndex = Math.floor(seededRandom(homeSeed) * teams.length);
+                let awayIndex = Math.floor(seededRandom(awaySeed) * teams.length);
+
+                // Ensure home and away are different
+                while (awayIndex === homeIndex) {
+                    awayIndex = (awayIndex + 1) % teams.length;
+                }
+
                 matches.push({
-                    idEvent: 'mock_' + leagueId + '_' + Date.now() + '_' + i,
+                    idEvent: 'mock_' + leagueId + '_' + matchDate.toISOString().split('T')[0] + '_' + i,
                     strLeague: leagueData.league,
                     dateEvent: matchDate.toISOString().split('T')[0],
                     strTime: selectedTime,
-                    strHomeTeam: teams[i * 2],
-                    strAwayTeam: teams[i * 2 + 1]
+                    strHomeTeam: teams[homeIndex],
+                    strAwayTeam: teams[awayIndex]
                 });
             }
+
+            // Sort by date and time
+            matches.sort((a, b) => {
+                const dateA = new Date(a.dateEvent + 'T' + a.strTime);
+                const dateB = new Date(b.dateEvent + 'T' + b.strTime);
+                return dateA - dateB;
+            });
 
             return matches;
         }
@@ -3907,13 +4083,14 @@
                 const now = new Date();
                 const hasStarted = matchDateTime < now;
                 const matchStatus = hasStarted ? 'disabled' : '';
-                // Generate Fake Odds based on nothing (random)
-                // In a real app, we'd fetch odds.
-                // Seed random with match ID to keep odds consistent
+
+                // Timezone adjustment
+                const localTime = matchDateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const localDate = matchDateTime.toLocaleDateString();
+
                 // Generate Fake Odds based on match ID
                 let seed = 0;
                 if (match.idEvent && match.idEvent.toString().startsWith('mock_')) {
-                    // Simple hash for mock string
                     for (let i = 0; i < match.idEvent.length; i++) {
                         seed += match.idEvent.charCodeAt(i);
                     }
@@ -3931,22 +4108,36 @@
                 const disabledStyle = hasStarted ? 'opacity:0.5; pointer-events:none;' : '';
                 const disabledCursor = hasStarted ? 'cursor:not-allowed;' : 'cursor:pointer;';
 
+                // Team Logos (using ui-avatars as placeholder/fallback)
+                const getLogo = (name) => `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=40&rounded=true`;
+
+                // Simulation Button for TestUser
+                const simBtn = currentUser === 'TestUser' ? `
+                    <button onclick="event.stopPropagation(); simulateMatchResult('${match.idEvent}', '${match.strHomeTeam}', '${match.strAwayTeam}')" 
+                    style="margin-left:10px; padding:2px 5px; font-size:0.7rem; background:var(--accent); border:none; border-radius:4px; color:white; cursor:pointer;">
+                    Simulieren
+                    </button>
+                ` : '';
+
                 container.innerHTML += `
                     <div class="match-card" style="${hasStarted ? 'background:#1a1a1a; border-color:#333;' : ''}">
                         <div class="match-header">
                             <span>${match.strLeague}</span>
                             <div style="display:flex; align-items:center;">
-                                <span>${match.dateEvent} ${match.strTime.substring(0, 5)}</span>
+                                <span>${localDate} ${localTime}</span>
                                 ${statusBadge}
+                                ${simBtn}
                             </div>
                         </div>
                         <div class="match-teams">
                             <div class="team-info">
+                                <img src="${getLogo(match.strHomeTeam)}" style="width:30px; height:30px; margin-right:10px; border-radius:50%;">
                                 <span>${match.strHomeTeam}</span>
                             </div>
                             <div style="font-size:0.9rem; color:#888;">vs</div>
                             <div class="team-info away">
                                 <span>${match.strAwayTeam}</span>
+                                <img src="${getLogo(match.strAwayTeam)}" style="width:30px; height:30px; margin-left:10px; border-radius:50%;">
                             </div>
                         </div>
                         <div class="match-odds" style="${disabledStyle}">
@@ -4022,6 +4213,14 @@
             bets.sort((a, b) => b.timestamp - a.timestamp).forEach(bet => {
                 let statusColor = '#ccc';
                 let statusText = 'Offen';
+                let scoreText = '';
+
+                // Check for result in mockResults
+                if (db.appSettings && db.appSettings.mockResults && db.appSettings.mockResults[bet.eventId]) {
+                    const res = db.appSettings.mockResults[bet.eventId];
+                    scoreText = ` (${res.home}:${res.away})`;
+                }
+
                 if (bet.status === 'won') { statusColor = '#4CAF50'; statusText = 'GEWONNEN'; }
                 if (bet.status === 'lost') { statusColor = 'var(--danger)'; statusText = 'VERLOREN'; }
 
@@ -4037,7 +4236,7 @@
                                 <div style="font-size:0.9rem; color:#aaa;">Einsatz: ${bet.amount} Chips</div>
                             </div>
                             <div style="text-align:right;">
-                                <div style="font-weight:bold; color:${statusColor};">${statusText}</div>
+                                <div style="font-weight:bold; color:${statusColor};">${statusText}${scoreText}</div>
                                 ${bet.status === 'open' ? `<button class="btn-main" style="padding:5px 10px; font-size:0.7rem; margin-top:5px;" onclick="checkBetResult(${bet.id})">Prüfen</button>` : ''}
                             </div>
                         </div>
@@ -4061,6 +4260,31 @@
             // Fetch Event Status
             const bets = db.users[currentUser].sportsBets;
             const bet = bets.find(b => b.id === betId);
+
+            // CHECK FOR SIMULATED RESULT FIRST
+            if (db.appSettings && db.appSettings.mockResults && db.appSettings.mockResults[bet.eventId]) {
+                const simResult = db.appSettings.mockResults[bet.eventId];
+                const home = simResult.home;
+                const away = simResult.away;
+
+                let result = 'X';
+                if (home > away) result = '1';
+                if (away > home) result = '2';
+
+                if (bet.selection === result) {
+                    bet.status = 'won';
+                    const winAmount = Math.floor(bet.amount * bet.odds);
+                    addChips(currentUser, winAmount, bet.source);
+                    Swal.fire('Gewonnen!', `Das Spiel endete ${home}:${away}. Du gewinnst ${winAmount} Chips!`, 'success');
+                } else {
+                    bet.status = 'lost';
+                    Swal.fire('Verloren', `Das Spiel endete ${home}:${away}.`, 'error');
+                }
+                await save();
+                renderMyBets();
+                updateGameAccountDisplay('sports-account-info');
+                return;
+            }
 
             try {
                 const response = await fetch(`https://www.thesportsdb.com/api/v1/json/${API_KEY}/lookupevent.php?id=${bet.eventId}`);
@@ -4098,6 +4322,42 @@
                 }
             } catch (e) {
                 Swal.fire('Fehler', 'Verbindung fehlgeschlagen.', 'error');
+            }
+        }
+
+        async function simulateMatchResult(eventId, homeTeam, awayTeam) {
+            const { value: formValues } = await Swal.fire({
+                title: 'Ergebnis simulieren',
+                html: `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <label>${homeTeam}</label>
+                        <input id="sim-home" type="number" class="swal2-input" style="width:60px;" value="0">
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                        <label>${awayTeam}</label>
+                        <input id="sim-away" type="number" class="swal2-input" style="width:60px;" value="0">
+                    </div>
+                `,
+                focusConfirm: false,
+                background: '#1a1a1a', color: '#fff',
+                preConfirm: () => {
+                    return [
+                        document.getElementById('sim-home').value,
+                        document.getElementById('sim-away').value
+                    ]
+                }
+            });
+
+            if (formValues) {
+                if (!db.appSettings) db.appSettings = {};
+                if (!db.appSettings.mockResults) db.appSettings.mockResults = {};
+
+                db.appSettings.mockResults[eventId] = {
+                    home: parseInt(formValues[0]),
+                    away: parseInt(formValues[1])
+                };
+                await save();
+                Swal.fire('Simuliert', 'Ergebnis gespeichert. Wetten können nun geprüft werden.', 'success');
             }
         }
 
@@ -4329,7 +4589,9 @@
                     <h4 style="margin-top:0;"><i class="fas fa-dice"></i> Casino Verwaltung</h4>
                     <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:10px;">Einstellungen für
                         Wechselkurse und Spieleinsätze.</p>
-                    <button class="btn-main" style="background: var(--accent);" onclick="openCasinoSettings()">
+                    <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:10px;">Einstellungen für
+                        Wechselkurse und Spieleinsätze.</p>
+                    <button class="btn-main" style="background: var(--accent);" onclick="openCasinoSettingsPage()">
                         <i class="fas fa-cogs"></i> Casino bearbeiten
                     </button>
                 </div>
@@ -4615,12 +4877,15 @@
                             </div>
                         </div>
                         
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
                             <button class="btn-main" style="background: #555;" onclick="editUserImage('${username}')">
-                                <i class="fas fa-image"></i> Bild ändern
+                                <i class="fas fa-image"></i> Bild
                             </button>
                             <button class="btn-main" style="background: #555;" onclick="editUserLobs('${username}')">
-                                <i class="fas fa-edit"></i> Lobs ändern
+                                <i class="fas fa-edit"></i> Lobs
+                            </button>
+                            <button class="btn-main" style="background: #555;" onclick="editUsername('${username}')">
+                                <i class="fas fa-user-edit"></i> Name
                             </button>
                         </div>
                         
@@ -4648,6 +4913,48 @@
                 await save();
                 renderUserAdmin();
                 Swal.fire('Gespeichert!', 'Profilbild aktualisiert.', 'success');
+            }
+        }
+
+        async function editUsername(oldName) {
+            const { value: newName } = await Swal.fire({
+                title: `Name ändern für ${oldName}`,
+                input: 'text',
+                inputValue: oldName,
+                inputPlaceholder: 'Neuer Name',
+                showCancelButton: true,
+                background: '#1a1a1a',
+                color: '#fff'
+            });
+
+            if (newName && newName !== oldName) {
+                if (db.users[newName]) {
+                    Swal.fire('Fehler', 'Name bereits vergeben.', 'error');
+                    return;
+                }
+
+                // Copy user data to new key
+                db.users[newName] = db.users[oldName];
+                delete db.users[oldName];
+
+                // Update logs
+                db.logs.forEach(log => {
+                    if (log.sender === oldName) log.sender = newName;
+                    if (log.receiver === oldName) log.receiver = newName;
+                    log.msg = log.msg.replace(oldName, newName);
+                });
+
+                // Update received references in other users
+                Object.values(db.users).forEach(u => {
+                    if (u.received && u.received[oldName]) {
+                        u.received[newName] = u.received[oldName];
+                        delete u.received[oldName];
+                    }
+                });
+
+                await save();
+                renderUserAdmin();
+                Swal.fire('Gespeichert!', `User umbenannt in ${newName}.`, 'success');
             }
         }
 
@@ -4923,6 +5230,7 @@
 
             const filteredLogs = db.logs.filter(log => {
                 if (currentLogFilter === 'ALL') return true;
+                if (currentLogFilter === 'CASINO') return log.msg.includes('(CASINO)'); // Explicit check
                 return log.msg.includes(`(${currentLogFilter})`);
             });
 
