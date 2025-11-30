@@ -11,44 +11,44 @@ const dbPath = path.join(__dirname, 'db.json');
 // --- MIDDLEWARE ---
 // Erlaube CORS (Cross-Origin Resource Sharing) für das Frontend, 
 // das wahrscheinlich unter einer anderen Adresse läuft (z.B. file:// oder Vercel/Render)
-app.use(cors()); 
+app.use(cors());
 
 // Middleware, um JSON-Körper in Anfragen zu parsen
-app.use(express.json()); 
+app.use(express.json());
 
 // --- DATENBANK MANAGEMENT ---
 
 // Standard-Datenbankstruktur (als Fallback)
 const DEFAULT_DB = {
     users: {
-        "Thomas": { 
-            password: "nacke", 
-            image: "https://api.dicebear.com/7.x/notionists/svg?seed=Thomas", 
-            lastSeenScore: 0, 
-            received: { "Emil": 0, "Marius": 0 }, 
+        "Thomas": {
+            password: "nacke",
+            image: "https://api.dicebear.com/7.x/notionists/svg?seed=Thomas",
+            lastSeenScore: 0,
+            received: { "Emil": 0, "Marius": 0 },
             badges: [],
             autoLogin: false
         },
-        "Emil":   { 
-            password: "nacke", 
-            image: "https://api.dicebear.com/7.x/notionists/svg?seed=Emil", 
-            lastSeenScore: 0, 
-            received: { "Thomas": 0, "Marius": 0 }, 
+        "Emil": {
+            password: "nacke",
+            image: "https://api.dicebear.com/7.x/notionists/svg?seed=Emil",
+            lastSeenScore: 0,
+            received: { "Thomas": 0, "Marius": 0 },
             badges: [],
             autoLogin: false
         },
-        "Marius": { 
-            password: "nacke", 
-            image: "https://api.dicebear.com/7.x/notionists/svg?seed=Marius", 
-            lastSeenScore: 0, 
-            received: { "Thomas": 0, "Emil": 0 }, 
+        "Marius": {
+            password: "nacke",
+            image: "https://api.dicebear.com/7.x/notionists/svg?seed=Marius",
+            lastSeenScore: 0,
+            received: { "Thomas": 0, "Emil": 0 },
             badges: [],
             autoLogin: false
         },
-        "Admin": { 
-            password: "nacke", 
-            image: "https://api.dicebear.com/7.x/micah/svg?seed=Admin", 
-            lastSeenScore: 0, 
+        "Admin": {
+            password: "nacke",
+            image: "https://api.dicebear.com/7.x/micah/svg?seed=Admin",
+            lastSeenScore: 0,
             received: {},
             adminLobs: 0,
             badges: [],
@@ -74,14 +74,14 @@ function loadDatabase() {
         if (fs.existsSync(dbPath)) {
             const data = fs.readFileSync(dbPath, 'utf8');
             db = JSON.parse(data);
-            
+
             // WICHTIG: Stellt sicher, dass das Admin-Konto in der geladenen DB existiert,
             // falls es in einer älteren Version fehlte.
             if (!db.users['Admin']) {
                 db.users['Admin'] = DEFAULT_DB.users['Admin'];
             }
             if (typeof db.users['Admin'].adminLobs === 'undefined') {
-                 db.users['Admin'].adminLobs = 0;
+                db.users['Admin'].adminLobs = 0;
             }
 
             console.log('Datenbank erfolgreich geladen.');
@@ -134,19 +134,32 @@ app.post('/update', (req, res) => {
     }
 
     // Ersetze die In-Memory-Datenbank durch die vom Client gesendeten Daten
+    const oldDb = JSON.parse(JSON.stringify(db)); // Deep copy for comparison
     db = req.body;
-    
+
     // Speichern auf Festplatte
     fs.writeFile(dbPath, JSON.stringify(db, null, 2), err => {
         if (err) {
             console.error('Fehler beim Speichern der DB:', err);
             return res.status(500).send({ success: false, message: 'Speichern fehlgeschlagen.' });
         }
-        
-        // Füge eine kleine Log-Meldung für den Admin-Stand hinzu, um das Debuggen zu erleichtern
-        const adminLobs = db.users.Admin ? db.users.Admin.adminLobs : 'N/A';
-        console.log(`DB erfolgreich gespeichert. (Admin Lobs: ${adminLobs})`);
-        
+
+        // Log what actually changed
+        const newLogCount = db.logs ? db.logs.length : 0;
+        const oldLogCount = oldDb.logs ? oldDb.logs.length : 0;
+
+        if (newLogCount > oldLogCount && db.logs[0]) {
+            // New log entry - show what happened
+            const latestLog = db.logs[0];
+            console.log(`✓ ${latestLog.msg.substring(0, 80)}`);
+        } else if (db.users) {
+            // Check for other changes
+            const userNames = Object.keys(db.users).filter(u => u !== 'Admin' && u !== 'TestUser');
+            console.log(`✓ DB gespeichert | Users: ${userNames.join(', ')}`);
+        } else {
+            console.log('✓ DB gespeichert');
+        }
+
         res.status(200).send({ success: true });
     });
 });
