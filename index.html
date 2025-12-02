@@ -6070,8 +6070,11 @@
         }
 
         // Start
-        init();
-        startActivityPolling();
+        async function startApp() {
+            await init(); // Warten, bis 'db' initialisiert ist
+            startActivityPolling(); // Erst dann das Polling starten
+        }
+        startApp();
 
     </script>
 </body>
