@@ -2,6 +2,7 @@
 <html lang="de">
 
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LOB APP</title>
@@ -1052,6 +1053,28 @@
             color: #ccc;
         }
     </style>
+
+    <script>
+        // =======================================================
+        // GLOBALE KONFIGURATION UND UTILITY-FUNKTIONEN
+        // =======================================================
+
+        // WICHTIG: Die Basis-URL für das Backend.
+        // Diese Logik stellt sicher, dass es sowohl lokal als auch live funktioniert.
+        const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+        // Wenn localhost, verwenden wir den vollen Port. Andernfalls verwenden wir eine relative URL ('/'), 
+        // die automatisch auf die Domain der Online-App zeigt.
+        const API_BASE_URL = isLocalhost ? 'http://localhost:3000' : '';
+
+        // Timeout-Konfiguration
+        const FETCH_TIMEOUT_MS = 10000;
+
+        // Variable, um den aktuell eingeloggten Benutzer zu speichern
+        let loggedInUser = null;
+
+        // ... (Der Rest Ihrer 6000 Zeilen JavaScript-Code folgt hier) ...
+    </script>
+
 </head>
 
 <body>
