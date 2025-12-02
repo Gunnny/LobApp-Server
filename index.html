@@ -470,8 +470,7 @@
             opacity: 0.5;
             /* Halbtransparent/Ausgegraut */
             cursor: not-allowed;
-            pointer-events: none;
-            /* Verhindert Klicks im ausgegrauten Zustand */
+            /* pointer-events: none;  <-- REMOVED to allow goal setting */
             box-shadow: none;
             /* Entfernt den Schatten, um Inaktivität zu betonen */
         }
@@ -1202,7 +1201,8 @@
                 </div>
 
                 <!-- NEU: Ziel-Prämie Anzeige -->
-                <div id="goal-reward-display" class="hidden">
+                <!-- NEU: Ziel-Prämie Anzeige -->
+                <div id="goal-display" class="hidden">
                 </div>
 
                 <div id="reward-tracking-box" class="reward-progress hidden">
@@ -1623,56 +1623,59 @@
                         Chips)</label>
                     <input id="page-casino-rate" type="number" style="margin-bottom:15px;" placeholder="10">
 
-                    <label style="display:block; text-align:left; margin-bottom:5px; color:#aaa;">Blackjack Einsatz
-                        (Chips)</label>
-                    <input id="page-casino-bj-cost" type="number" style="margin-bottom:15px;" placeholder="1">
-
                     <label style="display:block; text-align:left; margin-bottom:5px; color:#aaa;">Standard
                         Zeitzone</label>
                     <select id="page-casino-timezone"
                         style="width:100%; background:#333; color:white; border:1px solid #555; padding:8px; border-radius:5px;">
-                        <option value="Europe/London">Europe/London (GMT)</option>
                         <option value="Europe/Berlin">Europe/Berlin (CET)</option>
-                        <option value="Europe/Paris">Europe/Paris (CET)</option>
-                        <option value="Europe/Rome">Europe/Rome (CET)</option>
-                        <option value="Europe/Madrid">Europe/Madrid (CET)</option>
-                        <option value="Europe/Vienna">Europe/Vienna (CET)</option>
-                        <option value="Europe/Warsaw">Europe/Warsaw (CET)</option>
-                        <option value="Europe/Athens">Europe/Athens (EET)</option>
-                        <option value="Europe/Moscow">Europe/Moscow (MSK)</option>
-                        <option value="Europe/Istanbul">Europe/Istanbul (TRT)</option>
+                        <option value="Europe/London">Europe/London (GMT)</option>
                         <option value="America/New_York">America/New_York (EST)</option>
-                        <option value="America/Chicago">America/Chicago (CST)</option>
-                        <option value="America/Denver">America/Denver (MST)</option>
-                        <option value="America/Los_Angeles">America/Los_Angeles (PST)</option>
-                        <option value="America/Toronto">America/Toronto (EST)</option>
-                        <option value="America/Mexico_City">America/Mexico_City (CST)</option>
-                        <option value="America/Sao_Paulo">America/Sao_Paulo (BRT)</option>
-                        <option value="America/Argentina/Buenos_Aires">America/Buenos_Aires (ART)</option>
                         <option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
-                        <option value="Asia/Shanghai">Asia/Shanghai (CST)</option>
-                        <option value="Asia/Hong_Kong">Asia/Hong_Kong (HKT)</option>
-                        <option value="Asia/Singapore">Asia/Singapore (SGT)</option>
-                        <option value="Asia/Bangkok">Asia/Bangkok (ICT)</option>
-                        <option value="Asia/Dubai">Asia/Dubai (GST)</option>
-                        <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
-                        <option value="Asia/Seoul">Asia/Seoul (KST)</option>
-                        <option value="Australia/Sydney">Australia/Sydney (AEDT)</option>
-                        <option value="Australia/Melbourne">Australia/Melbourne (AEDT)</option>
-                        <option value="Australia/Perth">Australia/Perth (AWST)</option>
-                        <option value="Pacific/Auckland">Pacific/Auckland (NZDT)</option>
-                        <option value="Africa/Cairo">Africa/Cairo (EET)</option>
-                        <option value="Africa/Johannesburg">Africa/Johannesburg (SAST)</option>
                         <option value="UTC">UTC</option>
                     </select>
                 </div>
 
                 <div class="settings-card">
-                    <h4 style="margin-top:0;">Slots Konfiguration</h4>
-                    <p style="font-size:0.8rem; color:#aaa; margin-bottom:10px;">Gib hier Emojis oder Bild-URLs ein
-                        (Komma-getrennt).</p>
+                    <h4 style="margin-top:0;">Blackjack</h4>
+                    <label style="display:block; text-align:left; margin-bottom:5px; color:#aaa;">Min. Einsatz
+                        (Chips)</label>
+                    <input id="page-casino-bj-cost" type="number" style="margin-bottom:15px;" placeholder="1">
+                    <label style="display:block; text-align:left; margin-bottom:5px; color:#aaa;">Payout Multiplier
+                        (z.B. 1.5)</label>
+                    <input id="page-casino-bj-payout" type="number" step="0.1" style="margin-bottom:15px;"
+                        placeholder="1.5">
+                </div>
+
+                <div class="settings-card">
+                    <h4 style="margin-top:0;">Roulette</h4>
+                    <label style="display:block; text-align:left; margin-bottom:5px; color:#aaa;">Min. Einsatz
+                        (Chips)</label>
+                    <input id="page-casino-roulette-cost" type="number" style="margin-bottom:15px;" placeholder="1">
+                </div>
+
+                <div class="settings-card">
+                    <h4 style="margin-top:0;">Slots</h4>
+                    <label style="display:block; text-align:left; margin-bottom:5px; color:#aaa;">Min. Einsatz pro Linie
+                        (Chips)</label>
+                    <input id="page-casino-slots-cost" type="number" style="margin-bottom:15px;" placeholder="1">
+                    <label style="display:block; text-align:left; margin-bottom:5px; color:#aaa;">Gewinnchance
+                        (%)</label>
+                    <input id="page-casino-slots-chance" type="number" style="margin-bottom:15px;" placeholder="30">
+
+                    <label style="display:block; text-align:left; margin-bottom:5px; color:#aaa;">Symbole
+                        (Komma-getrennt)</label>
                     <textarea id="page-casino-slots"
-                        style="width:100%; height:100px; background:#111; color:white; border:1px solid #333; border-radius:8px; padding:10px;"></textarea>
+                        style="width:100%; height:80px; background:#111; color:white; border:1px solid #333; border-radius:8px; padding:10px;"></textarea>
+                </div>
+
+                <div class="settings-card">
+                    <h4 style="margin-top:0;">Doppelt oder Nichts</h4>
+                    <label style="display:block; text-align:left; margin-bottom:5px; color:#aaa;">Min. Einsatz
+                        (Chips)</label>
+                    <input id="page-casino-cf-cost" type="number" style="margin-bottom:15px;" placeholder="1">
+                    <label style="display:block; text-align:left; margin-bottom:5px; color:#aaa;">Hausvorteil
+                        (%)</label>
+                    <input id="page-casino-cf-edge" type="number" style="margin-bottom:15px;" placeholder="5">
                 </div>
 
                 <button class="btn-main" onclick="saveCasinoSettingsPage()"
@@ -1809,7 +1812,8 @@
                     received: { "Emil": 0, "Marius": 0 },
                     chips: { "Emil": 0, "Marius": 0 },
                     badges: [],
-                    goalRewardId: null
+                    goalRewardId: null,
+                    settings: { mobileNotifications: false }
                 },
                 "Emil": {
                     password: "nacke",
@@ -1818,7 +1822,8 @@
                     received: { "Thomas": 0, "Marius": 0 },
                     chips: { "Thomas": 0, "Marius": 0 },
                     badges: [],
-                    goalRewardId: null
+                    goalRewardId: null,
+                    settings: { mobileNotifications: false }
                 },
                 "Marius": {
                     password: "nacke",
@@ -1827,7 +1832,8 @@
                     received: { "Thomas": 0, "Emil": 0 },
                     chips: { "Thomas": 0, "Emil": 0 },
                     badges: [],
-                    goalRewardId: null
+                    goalRewardId: null,
+                    settings: { mobileNotifications: false }
                 },
                 // NEU: Admin-Test-Konto, falls es nicht im Live-DB ist
                 "Admin": {
@@ -1837,7 +1843,8 @@
                     received: {}, // Admin empfängt nichts von Usern
                     chips: {},
                     adminLobs: 0, // Speicherort für Admin-Lobs
-                    badges: []
+                    badges: [],
+                    settings: { mobileNotifications: false }
                 }
             },
             logs: [],
@@ -1892,7 +1899,20 @@
                 if (typeof db.users[u].lastSeenScore === 'undefined') db.users[u].lastSeenScore = 0;
                 if (typeof db.users[u].autoLogin === 'undefined') db.users[u].autoLogin = false;
                 if (typeof db.users[u].badges === 'undefined') db.users[u].badges = [];
-                if (typeof db.users[u].goalRewardId === 'undefined') db.users[u].goalRewardId = null;
+                if (typeof db.users[u].settings === 'undefined') db.users[u].settings = { mobileNotifications: false };
+
+                // Migrate old goalRewardId to new goals structure
+                if (typeof db.users[u].goals === 'undefined') {
+                    db.users[u].goals = {};
+                    // Migrate old single goal if it exists
+                    if (db.users[u].goalRewardId) {
+                        const source = db.users[u].goalRewardSource || 'Emil'; // Default to first account
+                        db.users[u].goals[source] = db.users[u].goalRewardId;
+                        delete db.users[u].goalRewardId;
+                        delete db.users[u].goalRewardSource;
+                    }
+                }
+
 
                 if (typeof db.users[u].received === 'undefined') {
                     db.users[u].received = {};
@@ -1985,6 +2005,23 @@
             return total;
         }
 
+        // Helper function to calculate total Lobs for a user
+        function calculateLobs(user) {
+            return calculateTotalScore(user);
+        }
+
+        // Helper function to calculate total Chips for a user
+        function calculateBalance(user) {
+            let totalChips = 0;
+            const myData = db.users[user];
+            if (myData.chips) {
+                for (let source in myData.chips) {
+                    totalChips += myData.chips[source];
+                }
+            }
+            return totalChips;
+        }
+
         // NEUE, KORRIGIERTE getRelevantScores(user) in index.html
         function getRelevantScores(user) {
             if (!db.users[user]) return [];
@@ -2045,48 +2082,53 @@
             const profileDisplay = document.getElementById('profile-badge-display');
 
             // Simple display for home screen
-            display.innerHTML = '';
+            if (display) {
+                display.innerHTML = '';
 
-            // Erstelle ein Map für schnelleren Zugriff
-            const badgeMap = {};
-            db.badgeDefinitions.forEach(b => {
-                badgeMap[b.name] = b;
-            });
+                // Erstelle ein Map für schnelleren Zugriff
+                const badgeMap = {};
+                db.badgeDefinitions.forEach(b => {
+                    badgeMap[b.name] = b;
+                });
 
-            data.badges.forEach(name => {
-                const badge = badgeMap[name];
-                if (badge) {
-                    display.innerHTML += `<span title="${name}" style="margin: 0 5px; color:${badge.color};"><i class="fas ${badge.icon}"></i></span>`;
-                }
-            });
+                data.badges.forEach(name => {
+                    const badge = badgeMap[name];
+                    if (badge) {
+                        display.innerHTML += `<span title="${name}" style="margin: 0 5px; color:${badge.color};"><i class="fas ${badge.icon}"></i></span>`;
+                    }
+                });
+            }
+
 
             // Detailed display for profile screen with progress
-            profileDisplay.innerHTML = '';
+            if (profileDisplay) {
+                profileDisplay.innerHTML = '';
 
-            const total = calculateTotalScore(user);
+                const total = calculateTotalScore(user);
 
-            profileDisplay.innerHTML = '<div class="section-header" style="margin-top: 20px;">Deine Abzeichen</div>';
-            profileDisplay.innerHTML += '<div style="display: flex; flex-wrap: wrap; justify-content: center;">';
+                profileDisplay.innerHTML = '<div class="section-header" style="margin-top: 20px;">Deine Abzeichen</div>';
+                profileDisplay.innerHTML += '<div style="display: flex; flex-wrap: wrap; justify-content: center;">';
 
-            db.badgeDefinitions.forEach(badge => {
-                const unlocked = data.badges.includes(badge.name);
-                const progress = Math.min(100, (total / badge.threshold) * 100);
+                db.badgeDefinitions.forEach(badge => {
+                    const unlocked = data.badges.includes(badge.name);
+                    const progress = Math.min(100, (total / badge.threshold) * 100);
 
-                profileDisplay.innerHTML += `
-                    <div class="badge-item ${unlocked ? 'unlocked' : 'locked'}">
-                        <div class="badge-tooltip">${badge.desc} ${unlocked ? '✓' : `(${total}/${badge.threshold})`}</div>
-                        <div class="badge-icon" style="color: ${unlocked ? badge.color : '#666'};"><i class="fas ${badge.icon}"></i></div>
-                        <div class="badge-name">${badge.name}</div>
-                        ${!unlocked ? `
-                            <div class="badge-progress-container">
-                                <div class="badge-progress-bar" style="width: ${progress}%; background: ${badge.color};"></div>
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-            });
+                    profileDisplay.innerHTML += `
+                        <div class="badge-item ${unlocked ? 'unlocked' : 'locked'}">
+                            <div class="badge-tooltip">${badge.desc} ${unlocked ? '✓' : `(${total}/${badge.threshold})`}</div>
+                            <div class="badge-icon" style="color: ${unlocked ? badge.color : '#666'};"><i class="fas ${badge.icon}"></i></div>
+                            <div class="badge-name">${badge.name}</div>
+                            ${!unlocked ? `
+                                <div class="badge-progress-container">
+                                    <div class="badge-progress-bar" style="width: ${progress}%; background: ${badge.color};"></div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                });
 
-            profileDisplay.innerHTML += '</div>';
+                profileDisplay.innerHTML += '</div>';
+            }
         }
 
         async function attemptLogin(user) {
@@ -2371,7 +2413,7 @@
                     if (tab === 'home') renderDashboard(total);
                     if (tab === 'activity') renderActivity();
                     if (tab === 'shop') renderShop();
-                    if (tab === 'profile') renderProfile(total);
+                    if (tab === 'profile') renderProfile(); // Call renderProfile without total
                     if (tab === 'casino') renderCasino();
 
                     // Fallback für Admin-Tab wenn nicht eingeloggt
@@ -2409,7 +2451,8 @@
                     received: {},
                     chips: {},
                     badges: [],
-                    autoLogin: false
+                    autoLogin: false,
+                    settings: { mobileNotifications: false }
                 };
             }
 
@@ -2690,7 +2733,7 @@
                             <span style="font-size: 0.8rem; color: var(--text-muted); margin-left: 10px;">${log.time.split(',')[0]}</span>
                         </div>
                         <div style="font-size: 0.9rem;">
-                            ${actionText}: ${log.msg.includes('(REWARD)') ? log.msg.split('gelöst')[0] + ' eingelöst' : log.msg.split('lobt')[0] + ' Lob gegeben'}
+                            ${log.msg.includes('(REWARD)') ? log.msg.split('gelöst')[0] + ' eingelöst' : log.msg.split('lobt')[0] + ' Lob gegeben'}
                             ${log.reason ? `<br><span style="font-size:0.8rem; color:#aaa; font-style:italic;">"${log.reason}"</span>` : ''}
                         </div>
                     </div>
@@ -2708,49 +2751,61 @@
 
         // --- ZIEL-PRÄMIE (SPARFUNKTION) ---
         function renderGoalReward(maxScore) {
-            const goalDisplay = document.getElementById('goal-reward-display');
+            const goalDisplay = document.getElementById('goal-display');
             const userData = db.users[currentUser];
 
-            if (!userData || !userData.goalRewardId) {
-                goalDisplay.classList.add('hidden');
-                return;
-            }
-
-            const goalReward = db.rewards.find(r => r.id === userData.goalRewardId);
-            if (!goalReward) {
+            if (!userData || !userData.goals || Object.keys(userData.goals).length === 0) {
                 goalDisplay.classList.add('hidden');
                 return;
             }
 
             goalDisplay.classList.remove('hidden');
-            const progress = Math.min(100, (maxScore / goalReward.cost) * 100);
-            const missing = Math.max(0, goalReward.cost - maxScore);
-            const icon = REWARD_ICONS[goalReward.name] || REWARD_ICONS['default'];
+            const relevantScores = getRelevantScores(currentUser);
+
+            let goalsHtml = '';
+            for (const [sourceName, rewardId] of Object.entries(userData.goals)) {
+                const goalReward = db.rewards.find(r => r.id === rewardId);
+                if (!goalReward) continue;
+
+                const accountData = relevantScores.find(s => s.name === sourceName);
+                const currentScore = accountData ? accountData.score : 0;
+                const progress = Math.min(100, (currentScore / goalReward.cost) * 100);
+                const missing = Math.max(0, goalReward.cost - currentScore);
+                const icon = REWARD_ICONS[goalReward.name] || REWARD_ICONS['default'];
+
+                // Filling icon effect using linear gradient
+                const fillColor = accountData?.cssClass === 'thomas' ? '#00bcd4' : (accountData?.cssClass === 'emil' ? '#ff9900' : 'gold');
+                const fillingIcon = `<div style="font-size: 3rem; background: linear-gradient(to top, ${fillColor} ${progress}%, #444 ${progress}%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 10px;">${icon}</div>`;
+
+                goalsHtml += `
+                    <div class="goal-card" style="margin-bottom: 15px;">
+                        <div style="text-align: center;">
+                            ${fillingIcon}
+                            <div style="font-size: 1.1rem; font-weight: 700; color: var(--accent); margin-top: 10px;">${goalReward.name}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px;">Konto: ${sourceName}</div>
+                            
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem;">
+                                <span style="color: var(--text-muted);">Fortschritt</span>
+                                <span style="color: #fff; font-weight: 600;">${currentScore} / ${goalReward.cost}</span>
+                            </div>
+                            
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" style="width: ${progress}%"></div>
+                            </div>
+                            
+                            ${missing > 0 ? `<div style="margin-top: 8px; color: var(--accent); font-size: 0.85rem;">Noch ${missing} Lobs!</div>` : `<div style="margin-top: 8px; color: #4CAF50; font-size: 0.85rem;"><i class="fas fa-check-circle"></i> Erreicht!</div>`}
+                            
+                            <button class="btn-main" onclick="removeGoalForSource('${sourceName}')" style="background: #444; margin-top: 10px; font-size: 0.8rem; padding: 8px;">
+                                <i class="fas fa-times"></i> Entfernen
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
 
             goalDisplay.innerHTML = `
-                <div class="section-header" style="margin-top: 25px;"><i class="fas fa-bullseye"></i> Dein Sparziel</div>
-                <div class="goal-card">
-                    <div style="text-align: center;">
-                        <div class="goal-icon">${icon}</div>
-                        <div style="font-size: 1.3rem; font-weight: 700; color: var(--accent); margin-bottom: 5px;">${goalReward.name}</div>
-                        <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;">${goalReward.desc || ''}</div>
-                        
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                            <span style="color: var(--text-muted);">Fortschritt</span>
-                            <span style="color: #fff; font-weight: 600;">${maxScore} / ${goalReward.cost} Lobs</span>
-                        </div>
-                        
-                        <div class="progress-bar-container">
-                            <div class="progress-bar" style="width: ${progress}%"></div>
-                        </div>
-                        
-                        ${missing > 0 ? `<div style="margin-top: 10px; color: var(--accent); font-weight: 600;">Noch ${missing} Lobs bis zum Ziel!</div>` : `<div style="margin-top: 10px; color: #4CAF50; font-weight: 600;"><i class="fas fa-check-circle"></i> Ziel erreicht!</div>`}
-                        
-                        <button class="btn-main" onclick="removeGoalReward()" style="background: #444; margin-top: 15px; font-size: 0.9rem;">
-                            <i class="fas fa-times"></i> Ziel entfernen
-                        </button>
-                    </div>
-                </div>
+                <div class="section-header" style="margin-top: 25px;"><i class="fas fa-bullseye"></i> Deine Sparziele</div>
+                ${goalsHtml}
             `;
         }
 
@@ -2776,8 +2831,9 @@
                 }
             }
 
-            db.users[currentUser].goalRewardId = rewardId;
-            db.users[currentUser].goalRewardSource = selectedShopAccount; // Store source
+            // Store goal for this specific source
+            if (!db.users[currentUser].goals) db.users[currentUser].goals = {};
+            db.users[currentUser].goals[selectedShopAccount] = rewardId;
             await save();
 
             const reward = db.rewards.find(r => r.id === rewardId);
@@ -2790,16 +2846,16 @@
                 confirmButtonColor: '#ff4d6d'
             });
 
-            // Dashboard aktualisieren
-            nav('home');
+            // Refresh shop to show updated state
+            renderShop();
         }
 
-        async function removeGoalReward() {
+        async function removeGoalForSource(sourceName) {
             if (currentUser === 'Admin') return;
 
             const { isConfirmed } = await Swal.fire({
                 title: 'Ziel entfernen?',
-                text: 'Möchtest du dieses Sparziel wirklich entfernen?',
+                text: `Möchtest du das Sparziel für Konto ${sourceName} wirklich entfernen?`,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonText: 'Ja, entfernen',
@@ -2810,13 +2866,21 @@
             });
 
             if (isConfirmed) {
-                if (isConfirmed) {
-                    db.users[currentUser].goalRewardId = null;
-                    db.users[currentUser].goalRewardSource = null;
+                if (db.users[currentUser].goals && db.users[currentUser].goals[sourceName]) {
+                    delete db.users[currentUser].goals[sourceName];
                     await save();
                     nav('home');
                 }
             }
+        }
+
+        // Legacy function for compatibility
+        async function removeGoalReward() {
+            // Remove all goals
+            if (currentUser === 'Admin') return;
+            db.users[currentUser].goals = {};
+            await save();
+            nav('home');
         }
 
         // KORRIGIERTE renderShop() - MIT ACCOUNT SELECTION
@@ -2879,13 +2943,12 @@
 
                 // NEU: Ziel-Button
                 // Check if this reward is the current goal for the SELECTED account
-                // Note: We need to store goal source too.
                 const userData = db.users[currentUser];
-                const isCurrentGoal = (currentUser !== 'Admin' && userData.goalRewardId === r.id && userData.goalRewardSource === selectedShopAccount);
+                const isCurrentGoal = (currentUser !== 'Admin' && userData.goals && userData.goals[selectedShopAccount] === r.id);
 
                 const goalButton = currentUser !== 'Admin' ? `
-                    <button class="btn-main" onclick="event.stopPropagation(); ${isCurrentGoal ? 'removeGoalReward()' : `setGoalReward(${r.id})`}" 
-                        style="background: ${isCurrentGoal ? 'var(--accent)' : '#444'}; font-size: 0.8rem; padding: 8px; margin-top: 8px; width: 100%;">
+                    <button class="btn-main" onclick="event.stopPropagation(); ${isCurrentGoal ? `removeGoalForSource('${selectedShopAccount}')` : `setGoalReward(${r.id})`}" 
+                        style="background: ${isCurrentGoal ? 'var(--accent)' : '#00bcd4'}; font-size: 0.8rem; padding: 8px; margin-top: 8px; width: 100%;">
                         <i class="fas ${isCurrentGoal ? 'fa-check' : 'fa-bullseye'}"></i> ${isCurrentGoal ? 'Aktuelles Ziel' : 'Als Ziel setzen'}
                     </button>
                 ` : '';
@@ -2912,6 +2975,45 @@
         }
 
         // NEUE openShopItem(id) - Nutzt selectedShopAccount
+        async function setGoal(itemId) {
+            let targetAccount = selectedShopAccount;
+
+            if (!targetAccount) {
+                // Prompt user to select an account
+                const accounts = Object.keys(db.users).filter(u => u !== 'Admin' && u !== 'TestUser');
+                const { value: selectedAccount } = await Swal.fire({
+                    title: 'Konto auswählen',
+                    text: 'Für wen möchtest du dieses Ziel setzen?',
+                    input: 'select',
+                    inputOptions: accounts.reduce((acc, curr) => ({ ...acc, [curr]: curr }), {}),
+                    inputPlaceholder: 'Wähle ein Konto',
+                    showCancelButton: true,
+                    inputValidator: (value) => {
+                        return new Promise((resolve) => {
+                            if (value) {
+                                resolve();
+                            } else {
+                                resolve('Du musst ein Konto auswählen');
+                            }
+                        });
+                    }
+                });
+
+                if (selectedAccount) {
+                    targetAccount = selectedAccount;
+                } else {
+                    return; // Cancelled
+                }
+            }
+
+            const item = db.rewards.find(r => r.id === itemId);
+            if (!item) return;
+
+            db.users[targetAccount].goal = itemId;
+            await save();
+            renderShop(); // Refresh to show active goal
+            Swal.fire('Ziel gesetzt', `Du sparst nun auf: ${item.name}`, 'success');
+        }
         async function openShopItem(id) {
             if (!selectedShopAccount) {
                 Swal.fire('Info', 'Bitte wähle zuerst ein Konto aus.', 'info');
@@ -2940,6 +3042,13 @@
 
             let currentScore = 0;
             let success = false;
+            // Assuming this logic is handled elsewhere or needs to be added
+            // For now, let's simulate success if enough Lobs
+            if (db.users[currentUser].received[scoreSource] >= reward.cost) {
+                db.users[currentUser].received[scoreSource] -= reward.cost;
+                success = true;
+            }
+
             if (success) {
                 db.logs.unshift({
                     id: Date.now(),
@@ -2978,10 +3087,18 @@
             if (!db.appSettings.slots) db.appSettings.slots = [];
             if (!db.appSettings.timezone) db.appSettings.timezone = 'Europe/Berlin'; // Default
 
-            document.getElementById('page-casino-rate').value = db.appSettings.casino.exchangeRate;
-            document.getElementById('page-casino-bj-cost').value = db.appSettings.casino.blackjackCost;
-            document.getElementById('page-casino-slots').value = db.appSettings.slots.join(',');
-            document.getElementById('page-casino-timezone').value = db.appSettings.timezone;
+            const settings = getCasinoSettings();
+            document.getElementById('page-casino-rate').value = settings.casino.exchangeRate;
+            document.getElementById('page-casino-bj-cost').value = settings.casino.blackjackCost;
+            document.getElementById('page-casino-bj-payout').value = settings.casino.blackjackPayout;
+            document.getElementById('page-casino-roulette-cost').value = settings.casino.rouletteCost;
+            document.getElementById('page-casino-slots-cost').value = settings.casino.slotsCost;
+            document.getElementById('page-casino-slots-chance').value = settings.casino.slotWinChance;
+            document.getElementById('page-casino-cf-cost').value = settings.casino.coinFlipCost;
+            document.getElementById('page-casino-cf-edge').value = settings.casino.coinFlipHouseEdge;
+
+            document.getElementById('page-casino-slots').value = settings.slots.join(',');
+            document.getElementById('page-casino-timezone').value = settings.timezone;
 
             nav('admin'); // Ensure we are in admin context visually if needed, but we are overlaying
             document.getElementById('admin-casino-settings-view').classList.remove('hidden');
@@ -2996,16 +3113,30 @@
         async function saveCasinoSettingsPage() {
             const rate = parseInt(document.getElementById('page-casino-rate').value);
             const bjCost = parseInt(document.getElementById('page-casino-bj-cost').value);
+            const bjPayout = parseFloat(document.getElementById('page-casino-bj-payout').value);
+            const rouletteCost = parseInt(document.getElementById('page-casino-roulette-cost').value);
+            const slotsCost = parseInt(document.getElementById('page-casino-slots-cost').value);
+            const slotChance = parseInt(document.getElementById('page-casino-slots-chance').value);
+            const cfCost = parseInt(document.getElementById('page-casino-cf-cost').value);
+            const cfEdge = parseInt(document.getElementById('page-casino-cf-edge').value);
+
             const slotsStr = document.getElementById('page-casino-slots').value;
             const timezone = document.getElementById('page-casino-timezone').value;
 
-            if (isNaN(rate) || isNaN(bjCost)) {
+            if (isNaN(rate) || isNaN(bjCost) || isNaN(rouletteCost) || isNaN(slotsCost) || isNaN(cfCost)) {
                 Swal.fire('Fehler', 'Bitte gültige Zahlen eingeben.', 'error');
                 return;
             }
 
             db.appSettings.casino.exchangeRate = rate;
             db.appSettings.casino.blackjackCost = bjCost;
+            db.appSettings.casino.blackjackPayout = bjPayout || 1.5;
+            db.appSettings.casino.rouletteCost = rouletteCost;
+            db.appSettings.casino.slotsCost = slotsCost;
+            db.appSettings.casino.slotWinChance = slotChance || 30;
+            db.appSettings.casino.coinFlipCost = cfCost;
+            db.appSettings.casino.coinFlipHouseEdge = cfEdge || 5;
+
             db.appSettings.slots = slotsStr.split(',').map(s => s.trim()).filter(s => s);
             db.appSettings.timezone = timezone;
 
@@ -3025,8 +3156,26 @@
 
         function getCasinoSettings() {
             if (!db.appSettings) db.appSettings = {};
-            if (!db.appSettings.casino) db.appSettings.casino = { exchangeRate: 10, blackjackCost: 1 };
+            if (!db.appSettings.casino) db.appSettings.casino = {
+                exchangeRate: 10,
+                blackjackCost: 1,
+                blackjackPayout: 1.5,
+                rouletteCost: 1,
+                slotsCost: 1,
+                slotWinChance: 30,
+                coinFlipCost: 1,
+                coinFlipHouseEdge: 5
+            };
+            // Ensure new properties exist if old structure is present
+            if (typeof db.appSettings.casino.blackjackPayout === 'undefined') db.appSettings.casino.blackjackPayout = 1.5;
+            if (typeof db.appSettings.casino.rouletteCost === 'undefined') db.appSettings.casino.rouletteCost = 1;
+            if (typeof db.appSettings.casino.slotsCost === 'undefined') db.appSettings.casino.slotsCost = 1;
+            if (typeof db.appSettings.casino.slotWinChance === 'undefined') db.appSettings.casino.slotWinChance = 30;
+            if (typeof db.appSettings.casino.coinFlipCost === 'undefined') db.appSettings.casino.coinFlipCost = 1;
+            if (typeof db.appSettings.casino.coinFlipHouseEdge === 'undefined') db.appSettings.casino.coinFlipHouseEdge = 5;
+
             if (!db.appSettings.slots) db.appSettings.slots = ['🍒', '🍋', '🍉', '⭐', '💎', '7️⃣']; // Default Emojis
+            if (!db.appSettings.timezone) db.appSettings.timezone = 'Europe/Berlin';
             return db.appSettings;
         }
 
@@ -3037,7 +3186,7 @@
             document.getElementById('casino-exchange-menu').classList.add('hidden');
 
             // Hide all game views with correct IDs
-            const gameViews = ['blackjack-view', 'roulette-view', 'slots-view', 'coin-flip-view', 'sports-betting-view'];
+            const gameViews = ['blackjack-game', 'roulette-game', 'slots-game', 'coin-flip-view', 'sports-betting-view'];
             gameViews.forEach(viewId => {
                 const view = document.getElementById(viewId);
                 if (view) view.classList.add('hidden');
@@ -3061,9 +3210,16 @@
                 const amount = received[source] || 0;
                 const chips = (db.users[currentUser].chips && db.users[currentUser].chips[source]) || 0;
 
+                let iconHtml = '<i class="fas fa-user"></i>';
+                if (db.users[source] && db.users[source].image) {
+                    iconHtml = `<img src="${db.users[source].image}" style="width:50px; height:50px; border-radius:50%; object-fit:cover; border: 2px solid #333;">`;
+                } else if (source === 'Casino') {
+                    iconHtml = '<i class="fas fa-dice" style="font-size: 2rem;"></i>';
+                }
+
                 grid.innerHTML += `
                     <div class="shop-item-card account-select-card" onclick="selectCasinoAccount('${source}')">
-                        <div class="shop-icon" style="font-size:1.5rem; margin-bottom:5px;"><i class="fas fa-user"></i></div>
+                        <div class="shop-icon" style="margin-bottom:10px; display:flex; justify-content:center; align-items:center; height: 60px;">${iconHtml}</div>
                         <div style="font-weight:bold; font-size:0.9rem;">${source}</div>
                         <div class="shop-cost" style="color:var(--primary); font-size:0.9rem;">${amount} Lobs</div>
                         <div style="font-size:0.8rem; color:gold; margin-top:5px;">${chips} Chips</div>
@@ -3076,7 +3232,7 @@
             currentBetSource = source;
 
             // Hide all game views
-            const gameViews = ['blackjack-view', 'roulette-view', 'slots-view', 'coin-flip-view', 'sports-betting-view'];
+            const gameViews = ['blackjack-game', 'roulette-game', 'slots-game', 'coin-flip-view', 'sports-betting-view'];
             gameViews.forEach(viewId => {
                 const view = document.getElementById(viewId);
                 if (view && !view.classList.contains('hidden')) {
@@ -3093,7 +3249,7 @@
             currentBetSource = null;
 
             // Hide all game views
-            const gameViews = ['blackjack-view', 'roulette-view', 'slots-view', 'coin-flip-view', 'sports-betting-view'];
+            const gameViews = ['blackjack-game', 'roulette-game', 'slots-game', 'coin-flip-view', 'sports-betting-view'];
             gameViews.forEach(viewId => {
                 const view = document.getElementById(viewId);
                 if (view && !view.classList.contains('hidden')) {
@@ -3438,7 +3594,9 @@
                 const pScore = calculateHandScore(bjPlayerHand);
                 if (pScore === 21 && bjPlayerHand.length === 2) {
                     msgEl.innerText = "BLACKJACK! Du gewinnst fett!";
-                    addChips(currentUser, Math.floor(bet * 2.5), currentBetSource);
+                    // Use configurable payout (default 1.5)
+                    const payoutMult = settings.blackjackPayout || 1.5;
+                    addChips(currentUser, Math.floor(bet * (1 + payoutMult)), currentBetSource);
                 } else {
                     msgEl.innerText = "Gewonnen!";
                     msgEl.style.color = "gold";
@@ -3536,8 +3694,15 @@
 
         async function spinRoulette() {
             const totalBet = rouletteBets.reduce((sum, b) => sum + b.amount, 0);
+            const settings = getCasinoSettings().casino;
+            const minBet = settings.rouletteCost || 1;
+
             if (totalBet === 0) {
                 Swal.fire('Info', 'Bitte platziere erst einen Einsatz.', 'info');
+                return;
+            }
+            if (totalBet < minBet) {
+                Swal.fire('Info', `Der Mindesteinsatz beträgt ${minBet} Chips.`, 'info');
                 return;
             }
 
@@ -3648,8 +3813,8 @@
 
         function updateSlotsCost() {
             const lines = parseInt(document.getElementById('slots-lines').value);
-            const bet = parseInt(document.getElementById('slots-bet').value);
-            document.getElementById('slots-total-cost').innerText = `${lines * bet} Chip(s)`;
+            const betPerLine = parseInt(document.getElementById('slots-bet').value);
+            document.getElementById('slots-total-cost').innerText = `${lines * betPerLine} Chip(s)`;
         }
 
         function exitSlots() {
@@ -3686,10 +3851,21 @@
             const settings = getCasinoSettings();
             const symbols = settings.slots;
             const matrix = [];
+
+            // Win Chance Logic
+            const winChance = (settings.casino && settings.casino.slotWinChance) ? settings.casino.slotWinChance : 30;
+            const forceWin = Math.random() * 100 < winChance;
+            const winSym = symbols[Math.floor(Math.random() * symbols.length)];
+
             for (let r = 0; r < 3; r++) {
                 const row = [];
                 for (let c = 0; c < 5; c++) {
-                    row.push(symbols[Math.floor(Math.random() * symbols.length)]);
+                    if (forceWin && r === 1) {
+                        // Force win on middle row (Line 1)
+                        row.push(winSym);
+                    } else {
+                        row.push(symbols[Math.floor(Math.random() * symbols.length)]);
+                    }
                 }
                 matrix.push(row);
             }
@@ -3765,7 +3941,7 @@
         function openCoinFlip() {
             if (!currentBetSource) return;
             document.getElementById('casino-main-menu').classList.add('hidden');
-            document.getElementById('coinflip-game').classList.remove('hidden');
+            document.getElementById('coin-flip-view').classList.remove('hidden'); // Corrected ID
             updateGameAccountDisplay('cf-account-info');
             resetCoinFlip();
         }
@@ -3775,7 +3951,7 @@
                 addChips(currentUser, cfStake, currentBetSource);
                 save();
             }
-            document.getElementById('coinflip-game').classList.add('hidden');
+            document.getElementById('coin-flip-view').classList.add('hidden'); // Corrected ID
             document.getElementById('casino-main-menu').classList.remove('hidden');
             renderCasinoMainMenu();
         }
@@ -3796,8 +3972,15 @@
         async function startCoinFlip() {
             const input = document.getElementById('cf-bet-input').value;
             const bet = parseInt(input);
+            const settings = getCasinoSettings().casino;
+            const minBet = settings.coinFlipCost || 1;
+
             if (isNaN(bet) || bet <= 0) {
                 Swal.fire('Fehler', 'Ungültiger Einsatz', 'error');
+                return;
+            }
+            if (bet < minBet) {
+                Swal.fire('Fehler', `Mindesteinsatz ist ${minBet} Chips.`, 'error');
                 return;
             }
             if (!deductChipsFromSource(currentUser, currentBetSource, bet)) {
@@ -3826,8 +4009,25 @@
 
             const coin = document.getElementById('cf-coin');
 
-            // Determine Result
-            const isHead = Math.random() < 0.5;
+            // Determine Result with House Edge
+            const settings = getCasinoSettings().casino;
+            const edge = (settings.coinFlipHouseEdge || 5) / 100; // e.g. 0.05
+
+            // Win chance = 0.5 - (edge / 2) ? Or just simple: House wins if random < edge
+            // Let's say: 50/50 fair, but we skew it.
+            // If edge is 5%, then win chance is 47.5%.
+            // Let's implement: House wins immediately with probability 'edge'.
+            // Otherwise fair flip.
+
+            let isHead;
+            if (Math.random() < edge) {
+                // House wins (force result opposite to choice)
+                isHead = (choice === 'tail'); // If user chose tail, make it head
+            } else {
+                // Fair flip
+                isHead = Math.random() < 0.5;
+            }
+
             const result = isHead ? 'head' : 'tail';
 
             // Animation
@@ -3943,47 +4143,174 @@
                 '4331': { // Bundesliga
                     league: 'Bundesliga',
                     teams: [
-                        'Bayern München', 'Borussia Dortmund', 'RB Leipzig', 'Bayer Leverkusen',
-                        'VfB Stuttgart', 'Eintracht Frankfurt', 'SC Freiburg', 'VfL Wolfsburg',
-                        'Union Berlin', 'Borussia Mönchengladbach', 'FSV Mainz 05', 'Werder Bremen',
-                        'FC Augsburg', 'TSG Hoffenheim', 'VfL Bochum', '1. FC Heidenheim'
+                        { name: 'Bayern München', logo: 'https://crests.football-data.org/5.svg' },
+                        { name: 'Borussia Dortmund', logo: 'https://crests.football-data.org/4.svg' },
+                        { name: 'RB Leipzig', logo: 'https://crests.football-data.org/721.svg' },
+                        { name: 'Bayer Leverkusen', logo: 'https://crests.football-data.org/3.svg' },
+                        { name: 'VfB Stuttgart', logo: 'https://crests.football-data.org/10.svg' },
+                        { name: 'Eintracht Frankfurt', logo: 'https://crests.football-data.org/19.svg' },
+                        { name: 'SC Freiburg', logo: 'https://crests.football-data.org/17.svg' },
+                        { name: 'VfL Wolfsburg', logo: 'https://crests.football-data.org/11.svg' },
+                        { name: 'Union Berlin', logo: 'https://crests.football-data.org/28.svg' },
+                        { name: 'Borussia M\'gladbach', logo: 'https://crests.football-data.org/18.svg' },
+                        { name: 'FSV Mainz 05', logo: 'https://crests.football-data.org/15.svg' },
+                        { name: 'Werder Bremen', logo: 'https://crests.football-data.org/12.svg' },
+                        { name: 'FC Augsburg', logo: 'https://crests.football-data.org/16.svg' },
+                        { name: 'TSG Hoffenheim', logo: 'https://crests.football-data.org/2.svg' },
+                        { name: 'VfL Bochum', logo: 'https://crests.football-data.org/36.svg' },
+                        { name: '1. FC Heidenheim', logo: 'https://crests.football-data.org/44.svg' },
+                        { name: 'SV Darmstadt 98', logo: 'https://crests.football-data.org/55.svg' },
+                        { name: '1. FC Köln', logo: 'https://crests.football-data.org/1.svg' }
+                    ],
+                    schedule: [
+                        { dayOffset: 0, time: '20:30:00' },
+                        { dayOffset: 1, time: '15:30:00' },
+                        { dayOffset: 1, time: '15:30:00' },
+                        { dayOffset: 1, time: '15:30:00' },
+                        { dayOffset: 1, time: '15:30:00' },
+                        { dayOffset: 1, time: '15:30:00' },
+                        { dayOffset: 1, time: '18:30:00' },
+                        { dayOffset: 2, time: '15:30:00' },
+                        { dayOffset: 2, time: '17:30:00' }
                     ]
                 },
                 '4328': { // Premier League
                     league: 'Premier League',
                     teams: [
-                        'Manchester City', 'Arsenal', 'Liverpool', 'Chelsea',
-                        'Manchester United', 'Tottenham', 'Newcastle United', 'Aston Villa',
-                        'Brighton', 'West Ham', 'Crystal Palace', 'Fulham',
-                        'Brentford', 'Nottingham Forest', 'Everton', 'Wolves'
+                        { name: 'Manchester City', logo: 'https://crests.football-data.org/65.svg' },
+                        { name: 'Arsenal', logo: 'https://crests.football-data.org/57.svg' },
+                        { name: 'Liverpool', logo: 'https://crests.football-data.org/64.svg' },
+                        { name: 'Chelsea', logo: 'https://crests.football-data.org/61.svg' },
+                        { name: 'Manchester United', logo: 'https://crests.football-data.org/66.svg' },
+                        { name: 'Tottenham', logo: 'https://crests.football-data.org/73.svg' },
+                        { name: 'Newcastle United', logo: 'https://crests.football-data.org/67.svg' },
+                        { name: 'Aston Villa', logo: 'https://crests.football-data.org/58.svg' },
+                        { name: 'Brighton', logo: 'https://crests.football-data.org/397.svg' },
+                        { name: 'West Ham', logo: 'https://crests.football-data.org/563.svg' },
+                        { name: 'Crystal Palace', logo: 'https://crests.football-data.org/354.svg' },
+                        { name: 'Fulham', logo: 'https://crests.football-data.org/63.svg' },
+                        { name: 'Brentford', logo: 'https://crests.football-data.org/402.svg' },
+                        { name: 'Nottingham Forest', logo: 'https://crests.football-data.org/351.svg' },
+                        { name: 'Everton', logo: 'https://crests.football-data.org/62.svg' },
+                        { name: 'Wolves', logo: 'https://crests.football-data.org/76.svg' },
+                        { name: 'Bournemouth', logo: 'https://crests.football-data.org/1044.svg' },
+                        { name: 'Burnley', logo: 'https://crests.football-data.org/328.svg' },
+                        { name: 'Sheffield United', logo: 'https://crests.football-data.org/356.svg' },
+                        { name: 'Luton Town', logo: 'https://crests.football-data.org/389.svg' }
+                    ],
+                    schedule: [
+                        { dayOffset: 1, time: '13:30:00' },
+                        { dayOffset: 1, time: '16:00:00' },
+                        { dayOffset: 1, time: '16:00:00' },
+                        { dayOffset: 1, time: '16:00:00' },
+                        { dayOffset: 1, time: '16:00:00' },
+                        { dayOffset: 1, time: '18:30:00' },
+                        { dayOffset: 2, time: '15:00:00' },
+                        { dayOffset: 2, time: '15:00:00' },
+                        { dayOffset: 2, time: '17:30:00' },
+                        { dayOffset: 3, time: '21:00:00' }
                     ]
                 },
                 '4335': { // La Liga
                     league: 'La Liga',
                     teams: [
-                        'Real Madrid', 'Barcelona', 'Atlético Madrid', 'Sevilla',
-                        'Real Sociedad', 'Villarreal', 'Real Betis', 'Athletic Bilbao',
-                        'Valencia', 'Celta Vigo', 'Osasuna', 'Girona',
-                        'Rayo Vallecano', 'Getafe', 'Mallorca', 'Las Palmas'
+                        { name: 'Real Madrid', logo: 'https://crests.football-data.org/86.svg' },
+                        { name: 'Barcelona', logo: 'https://crests.football-data.org/81.svg' },
+                        { name: 'Atlético Madrid', logo: 'https://crests.football-data.org/78.svg' },
+                        { name: 'Sevilla', logo: 'https://crests.football-data.org/559.svg' },
+                        { name: 'Real Sociedad', logo: 'https://crests.football-data.org/92.svg' },
+                        { name: 'Villarreal', logo: 'https://crests.football-data.org/94.svg' },
+                        { name: 'Real Betis', logo: 'https://crests.football-data.org/90.svg' },
+                        { name: 'Athletic Bilbao', logo: 'https://crests.football-data.org/77.svg' },
+                        { name: 'Valencia', logo: 'https://crests.football-data.org/95.svg' },
+                        { name: 'Celta Vigo', logo: 'https://crests.football-data.org/558.svg' },
+                        { name: 'Osasuna', logo: 'https://crests.football-data.org/79.svg' },
+                        { name: 'Girona', logo: 'https://crests.football-data.org/298.svg' },
+                        { name: 'Rayo Vallecano', logo: 'https://crests.football-data.org/87.svg' },
+                        { name: 'Getafe', logo: 'https://crests.football-data.org/82.svg' },
+                        { name: 'Mallorca', logo: 'https://crests.football-data.org/89.svg' },
+                        { name: 'Las Palmas', logo: 'https://crests.football-data.org/275.svg' },
+                        { name: 'Alavés', logo: 'https://crests.football-data.org/263.svg' },
+                        { name: 'Granada', logo: 'https://crests.football-data.org/925.svg' },
+                        { name: 'Cádiz', logo: 'https://crests.football-data.org/264.svg' },
+                        { name: 'Almería', logo: 'https://crests.football-data.org/267.svg' }
+                    ],
+                    schedule: [
+                        { dayOffset: 0, time: '21:00:00' },
+                        { dayOffset: 1, time: '14:00:00' },
+                        { dayOffset: 1, time: '16:15:00' },
+                        { dayOffset: 1, time: '18:30:00' },
+                        { dayOffset: 1, time: '21:00:00' },
+                        { dayOffset: 2, time: '14:00:00' },
+                        { dayOffset: 2, time: '16:15:00' },
+                        { dayOffset: 2, time: '18:30:00' },
+                        { dayOffset: 2, time: '21:00:00' },
+                        { dayOffset: 3, time: '21:00:00' }
                     ]
                 },
                 '4346': { // 2. Bundesliga
                     league: '2. Bundesliga',
                     teams: [
-                        'Hamburger SV', 'FC Schalke 04', 'Hertha BSC', 'Fortuna Düsseldorf',
-                        'FC St. Pauli', 'Hannover 96', '1. FC Nürnberg', '1. FC Kaiserslautern',
-                        'Karlsruher SC', 'SV Darmstadt 98', 'FC Hansa Rostock', 'Holstein Kiel',
-                        'SpVgg Greuther Fürth', 'SV Sandhausen', 'SC Paderborn', 'Eintracht Braunschweig',
-                        'Dynamo Dresden'
+                        { name: 'Hamburger SV', logo: 'https://crests.football-data.org/57.svg' },
+                        { name: 'FC Schalke 04', logo: 'https://crests.football-data.org/6.svg' },
+                        { name: 'Hertha BSC', logo: 'https://crests.football-data.org/9.svg' },
+                        { name: 'Fortuna Düsseldorf', logo: 'https://crests.football-data.org/24.svg' },
+                        { name: 'FC St. Pauli', logo: 'https://crests.football-data.org/20.svg' },
+                        { name: 'Hannover 96', logo: 'https://crests.football-data.org/8.svg' },
+                        { name: '1. FC Nürnberg', logo: 'https://crests.football-data.org/14.svg' },
+                        { name: '1. FC Kaiserslautern', logo: 'https://crests.football-data.org/21.svg' },
+                        { name: 'Karlsruher SC', logo: 'https://crests.football-data.org/23.svg' },
+                        { name: 'SV Darmstadt 98', logo: 'https://crests.football-data.org/55.svg' },
+                        { name: 'FC Hansa Rostock', logo: 'https://crests.football-data.org/26.svg' },
+                        { name: 'Holstein Kiel', logo: 'https://crests.football-data.org/29.svg' },
+                        { name: 'SpVgg Greuther Fürth', logo: 'https://crests.football-data.org/25.svg' },
+                        { name: 'SV Sandhausen', logo: 'https://crests.football-data.org/254.svg' }, // Guess/Fallback
+                        { name: 'SC Paderborn', logo: 'https://crests.football-data.org/31.svg' },
+                        { name: 'Eintracht Braunschweig', logo: 'https://crests.football-data.org/45.svg' },
+                        { name: 'Dynamo Dresden', logo: 'https://crests.football-data.org/27.svg' },
+                        { name: '1. FC Magdeburg', logo: 'https://crests.football-data.org/42.svg' }
+                    ],
+                    schedule: [
+                        { dayOffset: 0, time: '18:30:00' },
+                        { dayOffset: 0, time: '18:30:00' },
+                        { dayOffset: 1, time: '13:00:00' },
+                        { dayOffset: 1, time: '13:00:00' },
+                        { dayOffset: 1, time: '13:00:00' },
+                        { dayOffset: 1, time: '20:30:00' },
+                        { dayOffset: 2, time: '13:30:00' },
+                        { dayOffset: 2, time: '13:30:00' },
+                        { dayOffset: 2, time: '13:30:00' }
                     ]
                 },
-                '4429': { // WM Quali
+                '4429': { // WM Quali (Example)
                     league: 'WM Qualifikation',
                     teams: [
-                        'Deutschland', 'Frankreich', 'Brasilien', 'Argentinien',
-                        'Spanien', 'Italien', 'England', 'Niederlande',
-                        'Portugal', 'Belgien', 'Kroatien', 'Dänemark',
-                        'Uruguay', 'Schweiz', 'Polen', 'Österreich'
+                        { name: 'Deutschland', logo: 'https://crests.football-data.org/759.svg' },
+                        { name: 'Frankreich', logo: 'https://crests.football-data.org/773.svg' },
+                        { name: 'Brasilien', logo: 'https://crests.football-data.org/764.svg' },
+                        { name: 'Argentinien', logo: 'https://crests.football-data.org/762.svg' },
+                        { name: 'Spanien', logo: 'https://crests.football-data.org/760.svg' },
+                        { name: 'Italien', logo: 'https://crests.football-data.org/784.svg' },
+                        { name: 'England', logo: 'https://crests.football-data.org/770.svg' },
+                        { name: 'Niederlande', logo: 'https://crests.football-data.org/8601.svg' },
+                        { name: 'Portugal', logo: 'https://crests.football-data.org/765.svg' },
+                        { name: 'Belgien', logo: 'https://crests.football-data.org/805.svg' },
+                        { name: 'Kroatien', logo: 'https://crests.football-data.org/799.svg' },
+                        { name: 'Dänemark', logo: 'https://crests.football-data.org/782.svg' },
+                        { name: 'Uruguay', logo: 'https://crests.football-data.org/758.svg' },
+                        { name: 'Schweiz', logo: 'https://crests.football-data.org/788.svg' },
+                        { name: 'Polen', logo: 'https://crests.football-data.org/794.svg' },
+                        { name: 'Österreich', logo: 'https://crests.football-data.org/816.svg' }
+                    ],
+                    schedule: [
+                        { dayOffset: 0, time: '20:45:00' },
+                        { dayOffset: 0, time: '20:45:00' },
+                        { dayOffset: 1, time: '18:00:00' },
+                        { dayOffset: 1, time: '20:45:00' },
+                        { dayOffset: 1, time: '20:45:00' },
+                        { dayOffset: 2, time: '15:00:00' },
+                        { dayOffset: 2, time: '18:00:00' },
+                        { dayOffset: 2, time: '20:45:00' }
                     ]
                 }
             };
@@ -3991,79 +4318,59 @@
             const leagueData = mockData[leagueId] || mockData['4331'];
             const matches = [];
             const teams = [...leagueData.teams];
+            const schedule = leagueData.schedule || [];
 
-            // Shuffle teams
-            for (let i = teams.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [teams[i], teams[j]] = [teams[j], teams[i]];
+            // --- DETERMINISTIC GENERATION ---
+            const today = new Date();
+            const dayOfWeek = today.getDay(); // 0=Sun, 1=Mon, ..., 5=Fri, 6=Sat
+
+            // FIX: Always start schedule from TODAY so we have upcoming matches
+            const anchorDate = new Date(today);
+            anchorDate.setHours(0, 0, 0, 0);
+
+            const seedString = anchorDate.toISOString().split('T')[0] + '_' + leagueId;
+            let seed = 0;
+            for (let i = 0; i < seedString.length; i++) {
+                seed = ((seed << 5) - seed) + seedString.charCodeAt(i);
+                seed |= 0;
             }
 
-            // Realistic match times for different days
-            const matchTimes = [
-                { time: '15:30:00', day: 6 },  // Saturday afternoon
-                { time: '18:30:00', day: 6 },  // Saturday evening
-                { time: '15:30:00', day: 0 },  // Sunday afternoon
-                { time: '17:30:00', day: 0 },  // Sunday evening
-                { time: '20:00:00', day: 2 },  // Tuesday evening
-                { time: '20:45:00', day: 3 },  // Wednesday evening
-                { time: '18:30:00', day: 4 },  // Thursday evening
-                { time: '20:30:00', day: 5 }   // Friday evening
-            ];
-
-            // Generate matches for Today, Tomorrow, and Day After Tomorrow
-            const today = new Date();
-            const matchesToGenerate = 12; // Generate enough matches to fill the days
-
-            // FIXED: Seeded Random Function (deterministic per day and iteration)
-            const dateString = today.toISOString().split('T')[0]; // YYYY-MM-DD
-            const baseSeed = parseInt(dateString.replace(/-/g, '')); // YYYYMMDD as number
-
-            const seededRandom = (seed) => {
-                const x = Math.sin(seed) * 10000;
-                return x - Math.floor(x);
+            const seededRandom = () => {
+                seed = (seed * 9301 + 49297) % 233280;
+                return seed / 233280;
             };
 
-            for (let i = 0; i < matchesToGenerate; i++) {
-                // Calculate date: 0=Today, 1=Tomorrow, 2=DayAfter
-                const daysToAdd = i % 3;
-                const matchDate = new Date(today);
-                matchDate.setDate(today.getDate() + daysToAdd);
-
-                // Pick appropriate match time based on day of week
-                const dayOfWeek = matchDate.getDay();
-                const timeOptions = matchTimes.filter(t =>
-                    t.day === dayOfWeek || (dayOfWeek >= 1 && dayOfWeek <= 5 && t.day >= 1 && t.day <= 5)
-                );
-
-                // Use FIXED seed based on date and iteration
-                const timeSeed = baseSeed + i * 17;
-                const selectedTime = timeOptions.length > 0
-                    ? timeOptions[Math.floor(seededRandom(timeSeed) * timeOptions.length)].time
-                    : '20:00:00';
-
-                // Deterministic team selection - different seeds for home and away
-                const homeSeed = baseSeed + i * 23;
-                const awaySeed = baseSeed + i * 29 + 7; // Offset to avoid same team
-
-                const homeIndex = Math.floor(seededRandom(homeSeed) * teams.length);
-                let awayIndex = Math.floor(seededRandom(awaySeed) * teams.length);
-
-                // Ensure home and away are different
-                while (awayIndex === homeIndex) {
-                    awayIndex = (awayIndex + 1) % teams.length;
+            const shuffle = (array) => {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(seededRandom() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
                 }
+                return array;
+            };
+
+            const shuffledTeams = shuffle([...teams]);
+            const numMatches = Math.floor(shuffledTeams.length / 2);
+
+            for (let i = 0; i < numMatches; i++) {
+                const homeTeam = shuffledTeams[i * 2];
+                const awayTeam = shuffledTeams[i * 2 + 1];
+                const slot = schedule[i % schedule.length];
+
+                const matchDate = new Date(anchorDate);
+                matchDate.setDate(anchorDate.getDate() + slot.dayOffset);
 
                 matches.push({
                     idEvent: 'mock_' + leagueId + '_' + matchDate.toISOString().split('T')[0] + '_' + i,
                     strLeague: leagueData.league,
                     dateEvent: matchDate.toISOString().split('T')[0],
-                    strTime: selectedTime,
-                    strHomeTeam: teams[homeIndex],
-                    strAwayTeam: teams[awayIndex]
+                    strTime: slot.time,
+                    strHomeTeam: homeTeam.name,
+                    strHomeTeamLogo: homeTeam.logo,
+                    strAwayTeam: awayTeam.name,
+                    strAwayTeamLogo: awayTeam.logo
                 });
             }
 
-            // Sort by date and time
             matches.sort((a, b) => {
                 const dateA = new Date(a.dateEvent + 'T' + a.strTime);
                 const dateB = new Date(b.dateEvent + 'T' + b.strTime);
@@ -4108,8 +4415,11 @@
                 const disabledStyle = hasStarted ? 'opacity:0.5; pointer-events:none;' : '';
                 const disabledCursor = hasStarted ? 'cursor:not-allowed;' : 'cursor:pointer;';
 
-                // Team Logos (using ui-avatars as placeholder/fallback)
-                const getLogo = (name) => `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=40&rounded=true`;
+                // Team Logos (Prioritize explicit logo, fallback to ui-avatars)
+                const getLogo = (name, logoUrl) => {
+                    if (logoUrl) return logoUrl;
+                    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=40&rounded=true`;
+                };
 
                 // Simulation Button for TestUser
                 const simBtn = currentUser === 'TestUser' ? `
@@ -4131,13 +4441,13 @@
                         </div>
                         <div class="match-teams">
                             <div class="team-info">
-                                <img src="${getLogo(match.strHomeTeam)}" style="width:30px; height:30px; margin-right:10px; border-radius:50%;">
+                                <img src="${getLogo(match.strHomeTeam, match.strHomeTeamLogo)}" style="width:30px; height:30px; margin-right:10px; object-fit:contain;">
                                 <span>${match.strHomeTeam}</span>
                             </div>
                             <div style="font-size:0.9rem; color:#888;">vs</div>
                             <div class="team-info away">
                                 <span>${match.strAwayTeam}</span>
-                                <img src="${getLogo(match.strAwayTeam)}" style="width:30px; height:30px; margin-left:10px; border-radius:50%;">
+                                <img src="${getLogo(match.strAwayTeam, match.strAwayTeamLogo)}" style="width:30px; height:30px; margin-left:10px; object-fit:contain;">
                             </div>
                         </div>
                         <div class="match-odds" style="${disabledStyle}">
@@ -4294,7 +4604,7 @@
                     const event = data.events[0];
                     // Check if finished
                     // intHomeScore, intAwayScore
-                    if (event.intHomeScore !== null && event.intAwayScore !== null) {
+                    if (event.intHomeScore !== null && event.intAwayScore !== null && event.intHomeScore !== "" && event.intAwayScore !== "") {
                         const home = parseInt(event.intHomeScore);
                         const away = parseInt(event.intAwayScore);
 
@@ -4315,12 +4625,18 @@
                         renderMyBets();
                         updateGameAccountDisplay('sports-account-info');
                     } else {
-                        Swal.fire('Noch offen', 'Das Spiel läuft noch oder hat noch nicht begonnen.', 'info');
+                        Swal.fire('Noch offen', 'Das Spiel hat noch nicht stattgefunden oder Ergebnisse sind noch nicht verfügbar.', 'info');
                     }
                 } else {
-                    Swal.fire('Fehler', 'Event Daten nicht gefunden.', 'error');
+                    // Fallback for mock events that are not in API and not simulated
+                    if (bet.eventId.startsWith('mock_')) {
+                        Swal.fire('Simulation nötig', 'Dies ist ein Test-Spiel. Bitte nutze den "Simulieren"-Button (als TestUser) um ein Ergebnis festzulegen.', 'info');
+                    } else {
+                        Swal.fire('Fehler', 'Event Daten nicht gefunden.', 'error');
+                    }
                 }
             } catch (e) {
+                console.error(e);
                 Swal.fire('Fehler', 'Verbindung fehlgeschlagen.', 'error');
             }
         }
@@ -4476,10 +4792,103 @@
         }
 
         // --- PROFILE ---
-        function renderProfile(total) {
+        function renderProfile() {
             if (currentUser === 'Admin') return;
-            document.getElementById('profile-avatar-preview').style.backgroundImage = `url('${db.users[currentUser].image}')`;
+            const user = db.users[currentUser];
+            const container = document.getElementById('profile-content');
+
+            // Ensure settings object exists
+            if (!user.settings) user.settings = { mobileNotifications: false };
+
+            container.innerHTML = `
+                <div class="profile-header">
+                    <img src="${user.image}" class="profile-avatar">
+                    <h2 class="profile-name">${currentUser}</h2>
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">${calculateLobs(currentUser)}</div>
+                            <div class="stat-label">Lobs</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${calculateBalance(currentUser)}</div>
+                            <div class="stat-label">Chips</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <h3>Einstellungen</h3>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <span>Auto-Login</span>
+                        <label class="switch">
+                            <input type="checkbox" ${user.autoLogin ? 'checked' : ''} onchange="toggleAutoLogin(this.checked)">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <span>Mobile Benachrichtigungen</span>
+                        <label class="switch">
+                            <input type="checkbox" ${user.settings.mobileNotifications ? 'checked' : ''} onchange="toggleMobileNotifications(this.checked)">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <button class="btn-secondary" onclick="logout()" style="width:100%; margin-top:10px;">Abmelden</button>
+                </div>
+                
+                <div class="settings-card" style="text-align: center;">
+                    <div id="profile-avatar-preview" class="avatar" style="background-image:url('${db.users[currentUser].image}');"></div>
+
+                    <input type="file" id="inp-avatar-file" accept="image/*" style="display:none;"
+                        onchange="handleFileUpload(this)">
+                    <button class="btn-main" onclick="document.getElementById('inp-avatar-file').click()"
+                        style="background: #444; margin-bottom: 10px;"><i class="fas fa-upload"></i> Bild aus
+                        Galerie
+                        wählen</button>
+                    <hr style="border: 1px solid #333; margin: 20px 0;">
+                    <input type="text" id="inp-avatar-url" placeholder="Oder Bild-URL einfügen">
+                    <button class="btn-main" onclick="saveAvatarFromURL()">URL speichern</button>
+
+                    <div id="profile-badge-display" style="margin-top:20px; font-size:2rem; color:white;"></div>
+                </div>
+
+                <div class="settings-card">
+                    <h4 style="margin-top:0;">Sicherheit</h4>
+                    <input type="password" id="inp-pass" placeholder="Neues Passwort">
+                    <button class="btn-main" style="background: #444;" onclick="savePass()">Passwort
+                        speichern</button>
+                </div>
+            `;
+
             renderBadges(currentUser);
+        }
+
+        async function toggleAutoLogin(enabled) {
+            db.users[currentUser].autoLogin = enabled;
+            await save();
+            if (enabled) {
+                localStorage.setItem('lobAutoUser', currentUser);
+            } else {
+                localStorage.removeItem('lobAutoUser');
+            }
+            showToast('Auto-Login', enabled ? 'Auto-Login aktiviert.' : 'Auto-Login deaktiviert.', 'info');
+        }
+
+        async function toggleMobileNotifications(enabled) {
+            db.users[currentUser].settings.mobileNotifications = enabled;
+            await save();
+
+            if (enabled) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Benachrichtigungen aktiviert',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            } else {
+                showToast('Benachrichtigungen', 'Mobile Benachrichtigungen deaktiviert.', 'info');
+            }
         }
 
         async function handleFileUpload(input) {
@@ -4598,7 +5007,8 @@
 
                 <div class="settings-card">
                     <h4 style="margin-top:0;"><i class="fas fa-key"></i> Passwort ändern</h4>
-                    <input type="password" id="admin-pass" placeholder="Neues Admin-Passwort">
+                    <input type="password" id="admin-pass" placeholder="Neues Admin-Passwort" style="margin-bottom: 10px;">
+                    <input type="password" id="admin-pass-confirm" placeholder="Passwort bestätigen" style="margin-bottom: 10px;">
                     <button class="btn-main" style="background: #444;" onclick="saveAdminPass()">Passwort
                         speichern</button>
                 </div>
@@ -4616,14 +5026,7 @@
                         onclick="resetFavicon()">Zurücksetzen</button>
                 </div>
 
-                <div class="section-header">Lob-Simulation</div>
-                <div class="settings-card">
-                    <p style="font-size:0.9rem; color: #ccc; margin-bottom:10px;">Simuliere, dass ein User einen
-                        anderen
-                        User lobt</p>
-                    <button class="btn-main" onclick="adminSendUserLob()" style="background: var(--accent);"><i
-                            class="fas fa-exchange-alt"></i> User-zu-User Lob erstellen</button>
-                </div>
+                <!-- Lob-Simulation removed from here -->
             `;
         }
 
@@ -4766,9 +5169,17 @@
         // Admin Passwort speichern
         async function saveAdminPass() {
             const newPass = document.getElementById('admin-pass').value;
+            const confirmPass = document.getElementById('admin-pass-confirm').value;
+
+            if (newPass !== confirmPass) {
+                Swal.fire('Fehler', 'Die Passwörter stimmen nicht überein.', 'error');
+                return;
+            }
+
             if (newPass.length >= 4) {
                 db.users['Admin'].password = newPass;
                 document.getElementById('admin-pass').value = '';
+                document.getElementById('admin-pass-confirm').value = '';
                 await save();
                 Swal.fire('Erfolg', 'Admin-Passwort wurde aktualisiert.', 'success');
             } else {
@@ -4859,42 +5270,86 @@
         // --- USER-VERWALTUNG (Admin Tab) ---
         function renderUserAdmin() {
             const container = document.getElementById('admin-user-management');
-            container.innerHTML = '';
 
-            Object.keys(db.users).forEach(username => {
-                if (username === 'Admin') return; // Admin nicht anzeigen
-
-                const user = db.users[username];
-                const totalLobs = calculateTotalScore(username);
-
-                container.innerHTML += `
-                    <div class="settings-card" style="margin-bottom: 15px;">
-                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
-                            <div class="avatar" style="background-image:url('${user.image}'); width:60px; height:60px;"></div>
-                            <div style="flex-grow:1;">
-                                <h4 style="margin:0;">${username}</h4>
-                                <div style="color: var(--text-muted); font-size: 0.9rem;">Gesamt: ${totalLobs} Lobs</div>
+            let userListHtml = '';
+            for (const [name, user] of Object.entries(db.users)) {
+                if (name === 'Admin' || name === 'TestUser') continue;
+                userListHtml += `
+                    <div class="admin-user-card" style="background:var(--bg); padding:15px; border-radius:8px; margin-bottom:10px; border:1px solid var(--border);">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div style="display:flex; align-items:center;">
+                                <img src="${user.image}" style="width:40px; height:40px; border-radius:50%; margin-right:10px;">
+                                <div>
+                                    <strong>${name}</strong><br>
+                                    <span style="font-size:0.8rem; color:#888;">Passwort: ${user.password}</span>
+                                </div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-weight:bold; color:var(--accent);">${calculateBalance(name)} Chips</div>
+                                <div style="font-size:0.8rem;">${calculateLobs(name)} Lobs</div>
                             </div>
                         </div>
-                        
-                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
-                            <button class="btn-main" style="background: #555;" onclick="editUserImage('${username}')">
-                                <i class="fas fa-image"></i> Bild
-                            </button>
-                            <button class="btn-main" style="background: #555;" onclick="editUserLobs('${username}')">
-                                <i class="fas fa-edit"></i> Lobs
-                            </button>
-                            <button class="btn-main" style="background: #555;" onclick="editUsername('${username}')">
-                                <i class="fas fa-user-edit"></i> Name
-                            </button>
+                        <div style="margin-top:10px; display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
+                            <button onclick="editUserImage('${name}')" style="padding:8px; background:var(--card-bg); border:1px solid var(--border); border-radius:4px; color:var(--text); cursor:pointer; font-size:0.8rem;"><i class="fas fa-image"></i> Bild</button>
+                            <button onclick="editUsername('${name}')" style="padding:8px; background:var(--card-bg); border:1px solid var(--border); border-radius:4px; color:var(--text); cursor:pointer; font-size:0.8rem;"><i class="fas fa-signature"></i> Name</button>
+                            <button onclick="adminChangePassword('${name}')" style="padding:8px; background:var(--card-bg); border:1px solid var(--border); border-radius:4px; color:var(--text); cursor:pointer; font-size:0.8rem;"><i class="fas fa-key"></i> PW</button>
                         </div>
-                        
-                        <button class="btn-main" style="background: var(--danger); margin-top: 10px;" onclick="deleteUser('${username}')">
-                            <i class="fas fa-trash"></i> User entfernen
-                        </button>
                     </div>
                 `;
+            }
+
+            container.innerHTML = `
+                <div style="display:flex; align-items:center; margin-bottom:20px;">
+                    <h3>Benutzerverwaltung</h3>
+                </div>
+                
+                <button onclick="adminSendUserLob()" style="width:100%; padding:12px; background:var(--accent); color:white; border:none; border-radius:8px; cursor:pointer; margin-bottom: 20px; font-weight:bold;">
+                    <i class="fas fa-exchange-alt"></i> Lob Simulieren
+                </button>
+
+                <div id="user-list">
+                    ${userListHtml}
+                </div>
+            `;
+        }
+
+        // Placeholder functions for admin user management
+        async function adminEditUser(username) {
+            // This function would open a detailed edit modal/view for the user
+            // For now, let's just show a placeholder alert
+            Swal.fire({
+                title: `Benutzer ${username} bearbeiten`,
+                text: 'Hier würden detaillierte Bearbeitungsoptionen für den Benutzer erscheinen.',
+                icon: 'info',
+                background: '#1a1a1a', color: '#fff'
             });
+        }
+
+        async function adminChangePassword(username) {
+            const { value: newPass } = await Swal.fire({
+                title: `Passwort für ${username} ändern`,
+                input: 'text',
+                inputPlaceholder: 'Neues Passwort eingeben',
+                showCancelButton: true,
+                background: '#1a1a1a', color: '#fff'
+            });
+
+            if (newPass) {
+                if (newPass.length < 4) {
+                    Swal.fire('Fehler', 'Passwort muss mindestens 4 Zeichen lang sein.', 'error');
+                    return;
+                }
+                db.users[username].password = newPass;
+                await save();
+                renderUserAdmin();
+                Swal.fire('Erfolg', `Passwort für ${username} wurde geändert.`, 'success');
+            }
+        }
+
+        async function simulateLob() {
+            // This function is similar to adminSendUserLob but might have different options
+            // For now, let's reuse adminSendUserLob
+            adminSendUserLob();
         }
 
         async function editUserImage(username) {
@@ -5005,6 +5460,98 @@
                     Swal.fire('Gespeichert', `${username} hat nun ${val} Lobs von ${source}.`, 'success');
                 }
             }
+        }
+
+        function renderAdminDashboard() {
+            const container = document.getElementById('admin-content');
+            container.innerHTML = `
+                <h3>Admin Dashboard</h3>
+                <div class="admin-grid">
+                    <div class="admin-card" onclick="renderUserAdmin()">
+                        <h4>Benutzer verwalten</h4>
+                        <p>Passwörter, Guthaben, Badges</p>
+                    </div>
+                    <div class="admin-card" onclick="renderAdminCasinoSettings()">
+                        <h4>Casino Einstellungen</h4>
+                        <p>Wechselkurse, Kosten, Limits</p>
+                    </div>
+                    <div class="admin-card" onclick="renderLogAdmin()">
+                        <h4>Logs einsehen</h4>
+                        <p>Transaktionen und Aktivitäten</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAdminCasinoSettings() {
+            const container = document.getElementById('admin-content');
+
+            // Ensure settings exist
+            if (!db.appSettings) db.appSettings = {};
+            if (!db.appSettings.exchangeRate) db.appSettings.exchangeRate = 10;
+            if (!db.appSettings.blackjackCost) db.appSettings.blackjackCost = 10;
+            if (!db.appSettings.rouletteCost) db.appSettings.rouletteCost = 10;
+            if (!db.appSettings.slotsCost) db.appSettings.slotsCost = 10;
+            if (!db.appSettings.coinFlipCost) db.appSettings.coinFlipCost = 10;
+
+            container.innerHTML = `
+                <div style="display:flex; align-items:center; margin-bottom:20px;">
+                    <button onclick="renderAdminDashboard()" style="background:none; border:none; color:var(--text); font-size:1.5rem; cursor:pointer; margin-right:10px;">←</button>
+                    <h3>Casino Einstellungen</h3>
+                </div>
+                
+                <div class="settings-form" style="background:var(--card-bg); padding:20px; border-radius:12px; border:1px solid var(--border);">
+                    <div style="margin-bottom:15px;">
+                        <label style="display:block; margin-bottom:5px;">Wechselkurs (Chips pro 1 Lob)</label>
+                        <input type="number" id="setting-exchange" value="${db.appSettings.exchangeRate}" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text);">
+                    </div>
+                    
+                    <h4 style="margin-top:20px; margin-bottom:10px; border-bottom:1px solid var(--border); padding-bottom:5px;">Spielkosten (Mindesteinsatz)</h4>
+                    
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                        <div>
+                            <label style="display:block; margin-bottom:5px;">Blackjack</label>
+                            <input type="number" id="setting-bj" value="${db.appSettings.blackjackCost}" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text);">
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:5px;">Roulette</label>
+                            <input type="number" id="setting-roulette" value="${db.appSettings.rouletteCost}" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text);">
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:5px;">Slots</label>
+                            <input type="number" id="setting-slots" value="${db.appSettings.slotsCost}" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text);">
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:5px;">Coin Flip</label>
+                            <input type="number" id="setting-coin" value="${db.appSettings.coinFlipCost}" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text);">
+                        </div>
+                    </div>
+
+                    <button onclick="saveCasinoSettings()" style="margin-top:20px; width:100%; padding:12px; background:var(--accent); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Speichern</button>
+                </div>
+            `;
+        }
+
+        async function saveCasinoSettings() {
+            const newExchange = parseInt(document.getElementById('setting-exchange').value);
+            const newBj = parseInt(document.getElementById('setting-bj').value);
+            const newRoulette = parseInt(document.getElementById('setting-roulette').value);
+            const newSlots = parseInt(document.getElementById('setting-slots').value);
+            const newCoin = parseInt(document.getElementById('setting-coin').value);
+
+            if (isNaN(newExchange) || isNaN(newBj) || isNaN(newRoulette) || isNaN(newSlots) || isNaN(newCoin)) {
+                Swal.fire('Fehler', 'Bitte gültige Zahlen eingeben.', 'error');
+                return;
+            }
+
+            db.appSettings.exchangeRate = newExchange;
+            db.appSettings.blackjackCost = newBj;
+            db.appSettings.rouletteCost = newRoulette;
+            db.appSettings.slotsCost = newSlots;
+            db.appSettings.coinFlipCost = newCoin;
+
+            await save();
+            Swal.fire('Gespeichert', 'Einstellungen wurden aktualisiert.', 'success');
         }
 
         // NEU: Casino Settings
@@ -5315,8 +5862,193 @@
             });
         }
 
+        // Activity Notification Logic
+        let lastLogCount = 0;
+        let lastUserDataSnapshot = null;
+
+        let lastLogId = 0;
+
+        function startActivityPolling() {
+            // Initial count and ID
+            if (db.logs && db.logs.length > 0) {
+                lastLogCount = db.logs.length;
+                lastLogId = db.logs[0].id;
+            }
+
+            if (currentUser && db.users[currentUser]) {
+                lastUserDataSnapshot = JSON.parse(JSON.stringify(db.users[currentUser]));
+            }
+
+            setInterval(async () => {
+                try {
+                    // Silent fetch to check for updates
+                    const response = await fetch('/db');
+                    const data = await response.json();
+
+                    // 1. Check for general log updates (for the bottom notification)
+                    if (data.logs && data.logs.length > lastLogCount) {
+                        lastLogCount = data.logs.length;
+                        showActivityNotification();
+                    }
+
+                    // 2. Check for User Specific Notifications (if logged in and enabled)
+                    if (currentUser && data.users[currentUser] && data.users[currentUser].settings && data.users[currentUser].settings.mobileNotifications) {
+                        const newUser = data.users[currentUser];
+                        const oldUser = lastUserDataSnapshot || newUser; // Fallback if first run
+
+                        // Check for new Lobs (Received count increased)
+                        const oldReceived = Object.values(oldUser.received || {}).reduce((a, b) => a + b, 0);
+                        const newReceived = Object.values(newUser.received || {}).reduce((a, b) => a + b, 0);
+
+                        if (newReceived > oldReceived) {
+                            // Find out who sent it?
+                            // We can check the diff in received object
+                            let sender = 'Jemand';
+                            for (const [s, amount] of Object.entries(newUser.received)) {
+                                if (amount > (oldUser.received[s] || 0)) {
+                                    sender = s;
+                                    break;
+                                }
+                            }
+                            showToast('Du wurdest gelobt!', `${sender} hat dir ein Lob gegeben!`, 'success');
+                        }
+
+                        // Check for Sports Bet Results (Status changed to won/lost)
+                        if (newUser.sportsBets && oldUser.sportsBets) {
+                            newUser.sportsBets.forEach(newBet => {
+                                const oldBet = oldUser.sportsBets.find(b => b.id === newBet.id);
+                                if (oldBet && oldBet.status === 'open' && newBet.status !== 'open') {
+                                    if (newBet.status === 'won') {
+                                        showToast('Wette Gewonnen!', `Du hast ${Math.floor(newBet.amount * newBet.odds)} Chips gewonnen!`, 'success');
+                                    } else if (newBet.status === 'lost') {
+                                        showToast('Wette Verloren', 'Leider kein Glück gehabt.', 'info');
+                                    }
+                                }
+                            });
+                        }
+
+                        // Check for Rewards/Premiums via Logs (using lastLogId)
+                        if (data.logs && data.logs.length > 0) {
+                            // Filter for new logs
+                            const newLogs = data.logs.filter(l => l.id > lastLogId);
+
+                            if (newLogs.length > 0) {
+                                // Update max ID seen
+                                const maxId = Math.max(...newLogs.map(l => l.id));
+                                if (maxId > lastLogId) lastLogId = maxId;
+
+                                newLogs.forEach(log => {
+                                    // Check if this log is relevant for rewards/premiums for THIS user
+                                    if (log.msg.includes(currentUser)) {
+                                        if (log.msg.includes('kauft') || log.msg.includes('löst')) {
+                                            showToast('Prämie eingelöst', log.msg, 'info');
+                                        }
+                                    }
+                                });
+                            }
+                        }
+
+                        // Update snapshot
+                        lastUserDataSnapshot = JSON.parse(JSON.stringify(newUser));
+                    } else {
+                        // Even if notifications are off, we must update snapshot and log ID to avoid stale alerts when turned on
+                        if (data.users && data.users[currentUser]) {
+                            lastUserDataSnapshot = JSON.parse(JSON.stringify(data.users[currentUser]));
+                        }
+                        if (data.logs && data.logs.length > 0) {
+                            if (data.logs[0].id > lastLogId) lastLogId = data.logs[0].id;
+                        }
+                    }
+
+                    // Update local db silently to keep state fresh? 
+                    // No, that might cause UI jumps. We only notify.
+                    // But for the snapshot comparison to work next time, we need the *new* data to be the *old* data.
+                    // We did that with lastUserDataSnapshot = newUser.
+
+                } catch (e) {
+                    // Ignore errors in background polling
+                }
+            }, 5000);
+        }
+
+        async function toggleMobileNotifications(enabled) {
+            if (!db.users[currentUser].settings) db.users[currentUser].settings = {};
+            db.users[currentUser].settings.mobileNotifications = enabled;
+            await save();
+            if (enabled) {
+                Swal.fire({
+                    toast: true, position: 'top', icon: 'success', title: 'Benachrichtigungen aktiviert', showConfirmButton: false, timer: 2000
+                });
+            }
+        }
+
+        function showToast(title, text, icon = 'info') {
+            Swal.fire({
+                toast: true,
+                position: 'top',
+                icon: icon,
+                title: title,
+                text: text,
+                showConfirmButton: false,
+                timer: 4000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            });
+        }
+
+        function showActivityNotification() {
+            // Create notification element if not exists
+            let notif = document.getElementById('activity-notification');
+            if (!notif) {
+                notif = document.createElement('div');
+                notif.id = 'activity-notification';
+                notif.style.cssText = `
+                    position: fixed;
+                    bottom: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: var(--accent);
+                    color: white;
+                    padding: 10px 20px;
+                    border-radius: 20px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                    cursor: pointer;
+                    z-index: 10000;
+                    font-size: 0.9rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    animation: slideUp 0.3s ease-out;
+                `;
+                notif.innerHTML = `
+                    <span>Neue Aktivität verfügbar</span>
+                    <span style="background:rgba(255,255,255,0.2); padding:2px 6px; border-radius:10px; font-size:0.8rem;">↻</span>
+                `;
+                notif.onclick = () => {
+                    location.reload();
+                };
+                document.body.appendChild(notif);
+
+                // Add keyframes for animation
+                const style = document.createElement('style');
+                style.innerHTML = `
+                    @keyframes slideUp {
+                        from { transform: translate(-50%, 100%); opacity: 0; }
+                        to { transform: translate(-50%, 0); opacity: 1; }
+                    }
+                `;
+                document.head.appendChild(style);
+            } else {
+                notif.style.display = 'flex';
+            }
+        }
+
         // Start
         init();
+        startActivityPolling();
 
     </script>
 </body>
