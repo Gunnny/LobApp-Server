@@ -35,17 +35,17 @@
   "rewards": [
     {
       "id": 1,
-      "name": "Kaffeepause gespendet",
+      "name": "Bier",
       "cost": 20
     },
     {
       "id": 2,
-      "name": "Pizza-Mittagessen",
+      "name": "Schachtel",
       "cost": 50
     },
     {
       "id": 3,
-      "name": "Extra Urlaubstag",
+      "name": "Clubabend auf mich",
       "cost": 100
     }
   ]
